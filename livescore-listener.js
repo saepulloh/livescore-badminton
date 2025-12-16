@@ -327,7 +327,7 @@ function startHttpServer() {
             res.end();
             return;
         }
-        
+        const lap = parsedUrl.query.id;
         switch (pathname) {
             case '/listpertandingan':
             case '/pertandingan':
@@ -374,8 +374,7 @@ function startHttpServer() {
                 
             case '/lapangan':
                 // Return specific lapangan data
-                const lap = parsedUrl.query.id;
-                if (lap && matchData[lap]) {
+               if (lap && matchData[lap]) {
                     res.writeHead(200);
                     res.end(JSON.stringify({
                         success: true,
@@ -391,8 +390,34 @@ function startHttpServer() {
                         available: Object.keys(matchData)
                     }, null, 2));
                 }
+
                 break;
+            case '/vmix':
+                // Return specific lapangan data
+
+                if (lap && matchData[lap]) {
+                    res.writeHead(200);
+                    const dataMentah = matchData[lap].initialData.match;
+                    delete dataMentah.livematch;
+                    delete dataMentah.history;
+                    const responseData = dataMentah; 
+                    res.end(JSON.stringify([{
+                        success: true,
+                        timestamp: new Date().toISOString(),
+                        lapangan: lap,
+                        data: responseData
+                    }], null, 2));
+                } else {
+                    res.writeHead(404);
+                    res.end(JSON.stringify({
+                        success: false,
+                        error: 'Lapangan not found',
+                        available: Object.keys(matchData)
+                    }, null, 2));
+                }
+               
                 
+                break;    
             case '/clear':
                 // Clear all data (for testing)
                 matchData = {};
