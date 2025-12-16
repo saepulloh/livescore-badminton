@@ -117,8 +117,8 @@ function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
     
     io.socket.on('clearLapangan', handleClearLapangan);
-    io.socket.on('play', handlePlay);
-    io.socket.on('playgame', handlePlayGame);
+    io.socket.on('addPoint', handlePlay);
+    io.socket.on('play', handlePlayGame);
     io.socket.on('updatescore', handleUpdateScore);
     io.socket.on('message', handleMessage);
 }
@@ -186,6 +186,12 @@ function handlePlayGame(data) {
     matchData[lapangan].matchInfo = data;
     matchData[lapangan].lastUpdate = new Date().toISOString();
     matchData[lapangan].status = 'on_court';
+    
+    // Also update initialData.match for backward compatibility
+    if (!matchData[lapangan].initialData) {
+        matchData[lapangan].initialData = {};
+    }
+    matchData[lapangan].initialData.match = data;
 }
 
 function handleUpdateScore(data) {
@@ -214,6 +220,12 @@ function handleUpdateScore(data) {
     matchData[lapangan].currentScore = data;
     matchData[lapangan].lastUpdate = new Date().toISOString();
     matchData[lapangan].status = 'playing';
+    
+    // Also update score in initialData.match if it exists (for backward compatibility)
+    if (matchData[lapangan].initialData && matchData[lapangan].initialData.match) {
+        // Update score fields in the match object
+        Object.assign(matchData[lapangan].initialData.match, data);
+    }
 }
 
 function handleMessage(data) {
@@ -393,30 +405,74 @@ function startHttpServer() {
 
                 break;
             case '/vmix':
-                // Return specific lapangan data
-
+                // vMix-friendly flat structure endpoint
                 if (lap && matchData[lap]) {
                     res.writeHead(200);
-                    const dataMentah = matchData[lap].initialData.match;
-                    delete dataMentah.livematch;
-                    delete dataMentah.history;
-                    const responseData = dataMentah; 
-                    res.end(JSON.stringify([{
-                        success: true,
-                        timestamp: new Date().toISOString(),
-                        lapangan: lap,
-                        data: responseData
-                    }], null, 2));
+                    
+                    const courtData = matchData[lap];
+                    const playData = courtData.playData || {};
+                    const matchInfo = courtData.matchInfo || playData;
+                    const currentScore = courtData.currentScore || {};
+                    
+                    // Extract team data
+                    const team1 = matchInfo.team1 || {};
+                    const team2 = matchInfo.team2 || {};
+                    
+                    // Build flat structure for vMix
+                    const vmixData = {
+                        // Court info
+                        court: lap,
+                        status: courtData.status || 'unknown',
+                        
+                        // Tournament info
+                        tournament_name: matchInfo.kelompok_pertandingan?.nama || '',
+                        round: matchInfo.round || '',
+                        match_number: matchInfo.nr || '',
+                        
+                        // Team 1
+                        team1_name: team1.displayName1 || team1.lastname1 || '',
+                        team1_firstname: team1.firstname1 || '',
+                        team1_lastname: team1.lastname1 || '',
+                        team1_club: team1.player1_club || '',
+                        team1_player2_name: team1.displayName2 || team1.lastname2 || '',
+                        
+                        // Team 2
+                        team2_name: team2.displayName1 || team2.lastname1 || '',
+                        team2_firstname: team2.firstname1 || '',
+                        team2_lastname: team2.lastname1 || '',
+                        team2_club: team2.player1_club || '',
+                        team2_player2_name: team2.displayName2 || team2.lastname2 || '',
+                        
+                        // Scores - from current score or match info
+                        team1_set1: currentScore.team1set1 ?? matchInfo.team1set1 ?? 0,
+                        team2_set1: currentScore.team2set1 ?? matchInfo.team2set1 ?? 0,
+                        team1_set2: currentScore.team1set2 ?? matchInfo.team1set2 ?? 0,
+                        team2_set2: currentScore.team2set2 ?? matchInfo.team2set2 ?? 0,
+                        team1_set3: currentScore.team1set3 ?? matchInfo.team1set3 ?? 0,
+                        team2_set3: currentScore.team2set3 ?? matchInfo.team2set3 ?? 0,
+                        
+                        // Current game scores (if available from updatescore)
+                        team1_current: currentScore.team1point || 0,
+                        team2_current: currentScore.team2point || 0,
+                        
+                        // Match status
+                        winner: matchInfo.pemenang || 0,
+                        retired: matchInfo.retired || 0,
+                        duration: matchInfo.durasi || 0,
+                        
+                        // Metadata
+                        last_update: courtData.lastUpdate || null
+                    };
+                    
+                    // Return WITHOUT array wrapper and minimal wrapper
+                    res.end(JSON.stringify(vmixData, null, 2));
                 } else {
                     res.writeHead(404);
                     res.end(JSON.stringify({
-                        success: false,
-                        error: 'Lapangan not found',
+                        error: 'Court not found',
                         available: Object.keys(matchData)
                     }, null, 2));
                 }
-               
-                
                 break;    
             case '/clear':
                 // Clear all data (for testing)
@@ -441,6 +497,7 @@ function startHttpServer() {
                         '/status': 'Get connection status and configuration',
                         '/events': 'Get event history (use ?limit=N for pagination)',
                         '/lapangan?id=N': 'Get data for specific court',
+                        '/vmix?id=N': 'Get data for specific court',
                         '/clear': 'Clear all stored data'
                     },
                     livescoreHost: LIVESCORE_HOST,
@@ -453,7 +510,7 @@ function startHttpServer() {
                 res.end(JSON.stringify({
                     success: false,
                     error: 'Not found',
-                    availableEndpoints: ['/', '/listpertandingan', '/status', '/events', '/lapangan?id=N', '/clear']
+                    availableEndpoints: ['/', '/listpertandingan', '/status', '/events', '/lapangan?id=N','/vmix?id=N', '/clear']
                 }, null, 2));
         }
     });
