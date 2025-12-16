@@ -1,29 +1,36 @@
 {
   "name": "livescore-listener",
   "version": "1.0.0",
-  "description": "Socket listener untuk livescore badminton dengan HTTP API endpoint",
-  "main": "livescore-listener.js",
+  "description": "Badminton livescore socket listener with vMix integration support",
+  "main": "livescore-listener-wib.js",
   "scripts": {
-    "start": "node livescore-listener.js",
-    "dev": "nodemon livescore-listener.js"
+    "start": "node livescore-listener-wib.js",
+    "dev": "node livescore-listener.js",
+    "test": "node test-connection.js"
   },
   "keywords": [
     "livescore",
     "badminton",
     "socket",
-    "sails"
+    "vmix",
+    "realtime",
+    "scoreboard"
   ],
-  "author": "",
+  "author": "Saepulloh",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.0.3",
     "sails.io.js": "^1.2.1",
     "socket.io-client": "^2.5.0"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/livescore-listener.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/livescore-listener/issues"
   }
 }
