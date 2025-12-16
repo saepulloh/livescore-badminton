@@ -374,8 +374,8 @@ start.bat
 
 ## 📖 Documentation
 
-- **[Dokumentasi/INSTALL-WINDOWS.md](INSTALL-WINDOWS.md)** - Panduan instalasi lengkap untuk Windows
-- **[Dokumentasi/VMIX-SETUP.md](VMIX-SETUP.md)** - Setup vMix integration step-by-step
+- **[INSTALL-WINDOWS.md](Dokumentasi/INSTALL-WINDOWS.md)** - Panduan instalasi lengkap untuk Windows
+- **[Dokumentasi/VMIX-SETUP.md](Dokumentasi/VMIX-SETUP.md)** - Setup vMix integration step-by-step
 - **[FORMAT-COMPARISON.md](FORMAT-COMPARISON.md)** - Perbandingan format API
 - **[WIB-TIMESTAMP-UPDATE.md](WIB-TIMESTAMP-UPDATE.md)** - Format timestamp WIB
 
