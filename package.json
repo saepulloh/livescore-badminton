@@ -1,0 +1,29 @@
+{
+  "name": "livescore-listener",
+  "version": "1.0.0",
+  "description": "Socket listener untuk livescore badminton dengan HTTP API endpoint",
+  "main": "livescore-listener.js",
+  "scripts": {
+    "start": "node livescore-listener.js",
+    "dev": "nodemon livescore-listener.js"
+  },
+  "keywords": [
+    "livescore",
+    "badminton",
+    "socket",
+    "sails"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "sails.io.js": "^1.2.1",
+    "socket.io-client": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
