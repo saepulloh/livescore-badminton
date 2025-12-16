@@ -117,8 +117,8 @@ function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
     
     io.socket.on('clearLapangan', handleClearLapangan);
-    io.socket.on('addPoint', handlePlay);
-    io.socket.on('play', handlePlayGame);
+    io.socket.on('play', handlePlay);
+    io.socket.on('playgame', handlePlayGame);
     io.socket.on('updatescore', handleUpdateScore);
     io.socket.on('message', handleMessage);
 }
@@ -142,7 +142,7 @@ function handleClearLapangan(data) {
     // Clear match data for this lapangan
     if (matchData[lapangan]) {
         matchData[lapangan].status = 'finished';
-        matchData[lapangan].lastUpdate = new Date().toISOString();
+        matchData[lapangan].lastUpdate = getWIBTimestamp();
         matchData[lapangan].finishData = data;
     }
 }
@@ -163,7 +163,7 @@ function handlePlay(data) {
         matchData[lapangan] = { scores: [], events: [] };
     }
     matchData[lapangan].playData = data;
-    matchData[lapangan].lastUpdate = new Date().toISOString();
+    matchData[lapangan].lastUpdate = getWIBTimestamp();
     matchData[lapangan].status = 'playing';
 }
 
@@ -184,7 +184,7 @@ function handlePlayGame(data) {
         matchData[lapangan] = { scores: [], events: [] };
     }
     matchData[lapangan].matchInfo = data;
-    matchData[lapangan].lastUpdate = new Date().toISOString();
+    matchData[lapangan].lastUpdate = getWIBTimestamp();
     matchData[lapangan].status = 'on_court';
     
     // Also update initialData.match for backward compatibility
@@ -213,12 +213,12 @@ function handleUpdateScore(data) {
     // Add score to history
     matchData[lapangan].scores.push({
         data: data,
-        timestamp: new Date().toISOString()
+        timestamp: getWIBTimestamp()
     });
     
     // Update current score
     matchData[lapangan].currentScore = data;
-    matchData[lapangan].lastUpdate = new Date().toISOString();
+    matchData[lapangan].lastUpdate = getWIBTimestamp();
     matchData[lapangan].status = 'playing';
     
     // Also update score in initialData.match if it exists (for backward compatibility)
@@ -267,7 +267,7 @@ function joinRoom(io, lapangan) {
                         scores: [], 
                         events: [],
                         status: 'waiting',
-                        joinedAt: new Date().toISOString()
+                        joinedAt: getWIBTimestamp()
                     };
                 }
                 
@@ -276,7 +276,7 @@ function joinRoom(io, lapangan) {
                     const preview = JSON.stringify(body);
                     console.log(`      └─ ${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
                     matchData[lapangan].initialData = body;
-                    matchData[lapangan].lastUpdate = new Date().toISOString();
+                    matchData[lapangan].lastUpdate = getWIBTimestamp();
                 }
             } else {
                 const status = response ? response.statusCode : 'timeout';
@@ -311,7 +311,13 @@ ${C.cyan}═══════════════════════�
 🏟️  Rooms: ${joinedRooms.join(', ')}
 
 🌐 HTTP Server: http://localhost:${PORT}
-   • /listpertandingan  → Data pertandingan
+   ${C.magenta}vMix Endpoints:${C.reset}
+   • ${C.bright}/vmix-flat?id=N${C.reset}  → Flat JSON (recommended) ⭐
+   • ${C.bright}/vmix-xml?id=N${C.reset}   → XML format
+   
+   ${C.cyan}Other Endpoints:${C.reset}
+   • /listpertandingan  → All match data
+   • /lapangan?id=N     → Specific court (full data)
    • /status            → Connection status
    • /events            → Event history
 
@@ -347,7 +353,7 @@ function startHttpServer() {
                 res.writeHead(200);
                 res.end(JSON.stringify({
                     success: true,
-                    timestamp: new Date().toISOString(),
+                    timestamp: getWIBTimestamp(),
                     connectionStatus: connectionStatus,
                     joinedRooms: joinedRooms,
                     totalCourts: Object.keys(matchData).length,
@@ -360,7 +366,7 @@ function startHttpServer() {
                 res.writeHead(200);
                 res.end(JSON.stringify({
                     success: true,
-                    timestamp: new Date().toISOString(),
+                    timestamp: getWIBTimestamp(),
                     livescoreHost: LIVESCORE_HOST,
                     connectionStatus: connectionStatus,
                     joinedRooms: joinedRooms,
@@ -377,7 +383,7 @@ function startHttpServer() {
                 res.writeHead(200);
                 res.end(JSON.stringify({
                     success: true,
-                    timestamp: new Date().toISOString(),
+                    timestamp: getWIBTimestamp(),
                     totalEvents: eventHistory.length,
                     showing: recentEvents.length,
                     events: recentEvents
@@ -390,7 +396,7 @@ function startHttpServer() {
                     res.writeHead(200);
                     res.end(JSON.stringify({
                         success: true,
-                        timestamp: new Date().toISOString(),
+                        timestamp: getWIBTimestamp(),
                         lapangan: lap,
                         data: matchData[lap]
                     }, null, 2));
@@ -405,6 +411,49 @@ function startHttpServer() {
 
                 break;
             case '/vmix':
+                // Return specific lapangan data (real-time updated)
+                if (lap && matchData[lap]) {
+                    res.writeHead(200);
+                    
+                    // Combine all available data - prioritize real-time updates
+                    const courtData = matchData[lap];
+                    
+                    // Build response from real-time data
+                    const responseData = {
+                        // Match info from playgame event
+                        ...(courtData.matchInfo || {}),
+                        // Current score from updatescore event
+                        currentScore: courtData.currentScore || null,
+                        // Latest play data
+                        playData: courtData.playData || null,
+                        // Status and metadata
+                        status: courtData.status || 'unknown',
+                        lastUpdate: courtData.lastUpdate || getWIBTimestamp(),
+                        // Score history for reference
+                        scoreHistory: courtData.scores || []
+                    };
+                    
+                    // Remove unwanted properties if they exist
+                    delete responseData.livematch;
+                    delete responseData.history;
+                    
+                    res.end(JSON.stringify([{
+                        success: true,
+                        timestamp: getWIBTimestamp(),
+                        lapangan: lap,
+                        data: responseData
+                    }], null, 2));
+                } else {
+                    res.writeHead(404);
+                    res.end(JSON.stringify({
+                        success: false,
+                        error: 'Lapangan not found',
+                        available: Object.keys(matchData)
+                    }, null, 2));
+                }
+                break;
+                
+            case '/vmix-flat':
                 // vMix-friendly flat structure endpoint
                 if (lap && matchData[lap]) {
                     res.writeHead(200);
@@ -460,8 +509,9 @@ function startHttpServer() {
                         retired: matchInfo.retired || 0,
                         duration: matchInfo.durasi || 0,
                         
-                        // Metadata
-                        last_update: courtData.lastUpdate || null
+                        // Metadata with WIB timezone
+                        last_update: courtData.lastUpdate || getWIBTimestamp(),
+                        update_time: getWIBTimestampShort()  // Short format: HH:MM:SS
                     };
                     
                     // Return WITHOUT array wrapper and minimal wrapper
@@ -472,6 +522,77 @@ function startHttpServer() {
                         error: 'Court not found',
                         available: Object.keys(matchData)
                     }, null, 2));
+                }
+                break;
+                
+            case '/vmix-xml':
+                // vMix XML format endpoint
+                if (lap && matchData[lap]) {
+                    res.setHeader('Content-Type', 'text/xml');
+                    res.writeHead(200);
+                    
+                    const courtData = matchData[lap];
+                    const playData = courtData.playData || {};
+                    const matchInfo = courtData.matchInfo || playData;
+                    const currentScore = courtData.currentScore || {};
+                    
+                    const team1 = matchInfo.team1 || {};
+                    const team2 = matchInfo.team2 || {};
+                    
+                    // Build XML structure
+                    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<match>
+  <court>${lap}</court>
+  <status>${courtData.status || 'unknown'}</status>
+  <tournament>${matchInfo.kelompok_pertandingan?.nama || ''}</tournament>
+  <round>${matchInfo.round || ''}</round>
+  <match_number>${matchInfo.nr || ''}</match_number>
+  
+  <team1>
+    <name>${team1.displayName1 || team1.lastname1 || ''}</name>
+    <firstname>${team1.firstname1 || ''}</firstname>
+    <lastname>${team1.lastname1 || ''}</lastname>
+    <club>${team1.player1_club || ''}</club>
+    <player2_name>${team1.displayName2 || team1.lastname2 || ''}</player2_name>
+  </team1>
+  
+  <team2>
+    <name>${team2.displayName1 || team2.lastname1 || ''}</name>
+    <firstname>${team2.firstname1 || ''}</firstname>
+    <lastname>${team2.lastname1 || ''}</lastname>
+    <club>${team2.player1_club || ''}</club>
+    <player2_name>${team2.displayName2 || team2.lastname2 || ''}</player2_name>
+  </team2>
+  
+  <scores>
+    <team1_set1>${currentScore.team1set1 ?? matchInfo.team1set1 ?? 0}</team1_set1>
+    <team2_set1>${currentScore.team2set1 ?? matchInfo.team2set1 ?? 0}</team2_set1>
+    <team1_set2>${currentScore.team1set2 ?? matchInfo.team1set2 ?? 0}</team1_set2>
+    <team2_set2>${currentScore.team2set2 ?? matchInfo.team2set2 ?? 0}</team2_set2>
+    <team1_set3>${currentScore.team1set3 ?? matchInfo.team1set3 ?? 0}</team1_set3>
+    <team2_set3>${currentScore.team2set3 ?? matchInfo.team2set3 ?? 0}</team2_set3>
+    <team1_current>${currentScore.team1point || 0}</team1_current>
+    <team2_current>${currentScore.team2point || 0}</team2_current>
+  </scores>
+  
+  <metadata>
+    <winner>${matchInfo.pemenang || 0}</winner>
+    <retired>${matchInfo.retired || 0}</retired>
+    <duration>${matchInfo.durasi || 0}</duration>
+    <last_update>${courtData.lastUpdate || getWIBTimestamp()}</last_update>
+    <update_time>${getWIBTimestampShort()}</update_time>
+  </metadata>
+</match>`;
+                    
+                    res.end(xml);
+                } else {
+                    res.setHeader('Content-Type', 'text/xml');
+                    res.writeHead(404);
+                    res.end(`<?xml version="1.0" encoding="UTF-8"?>
+<error>
+  <message>Court not found</message>
+  <available>${Object.keys(matchData).join(',')}</available>
+</error>`);
                 }
                 break;    
             case '/clear':
@@ -497,8 +618,15 @@ function startHttpServer() {
                         '/status': 'Get connection status and configuration',
                         '/events': 'Get event history (use ?limit=N for pagination)',
                         '/lapangan?id=N': 'Get data for specific court',
-                        '/vmix?id=N': 'Get data for specific court',
+                        '/vmix?id=N': 'Get match data (nested structure)',
+                        '/vmix-flat?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED FOR VMIX',
+                        '/vmix-xml?id=N': 'Get vMix-friendly XML data',
                         '/clear': 'Clear all stored data'
+                    },
+                    vmix_integration: {
+                        json: 'Use /vmix-flat?id=N for GT Title Designer or Web input',
+                        xml: 'Use /vmix-xml?id=N for Data Source (XML)',
+                        polling_interval: '1000ms recommended (1 second)'
                     },
                     livescoreHost: LIVESCORE_HOST,
                     joinedRooms: joinedRooms
@@ -510,7 +638,16 @@ function startHttpServer() {
                 res.end(JSON.stringify({
                     success: false,
                     error: 'Not found',
-                    availableEndpoints: ['/', '/listpertandingan', '/status', '/events', '/lapangan?id=N','/vmix?id=N', '/clear']
+                    availableEndpoints: [
+                        '/', 
+                        '/listpertandingan', 
+                        '/status', 
+                        '/events', 
+                        '/lapangan?id=N', 
+                        '/vmix-flat?id=N (vMix recommended)', 
+                        '/vmix-xml?id=N',
+                        '/clear'
+                    ]
                 }, null, 2));
         }
     });
@@ -523,6 +660,42 @@ function startHttpServer() {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================
+// WIB FORMATTER
+// ============================================
+function getWIBTimestamp() {
+    const date = new Date();
+    // WIB = UTC+7
+    const wibOffset = 7 * 60; // 7 hours in minutes
+    const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
+    const wibTime = new Date(utcTime + (wibOffset * 60000));
+    
+    // Format: DD Mon YYYY, HH:MM:SS WIB
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const day = String(wibTime.getDate()).padStart(2, '0');
+    const month = months[wibTime.getMonth()];
+    const year = wibTime.getFullYear();
+    const hours = String(wibTime.getHours()).padStart(2, '0');
+    const minutes = String(wibTime.getMinutes()).padStart(2, '0');
+    const seconds = String(wibTime.getSeconds()).padStart(2, '0');
+    
+    return `${day} ${month} ${year}, ${hours}:${minutes}:${seconds} WIB`;
+}
+
+function getWIBTimestampShort() {
+    const date = new Date();
+    const wibOffset = 7 * 60;
+    const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
+    const wibTime = new Date(utcTime + (wibOffset * 60000));
+    
+    // Format: HH:MM:SS
+    const hours = String(wibTime.getHours()).padStart(2, '0');
+    const minutes = String(wibTime.getMinutes()).padStart(2, '0');
+    const seconds = String(wibTime.getSeconds()).padStart(2, '0');
+    
+    return `${hours}:${minutes}:${seconds}`;
+}
 
 // ============================================
 // MAIN
