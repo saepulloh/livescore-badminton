@@ -117,8 +117,8 @@ function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
     
     io.socket.on('clearLapangan', handleClearLapangan);
-    io.socket.on('addPoint', handlePlay);
-    io.socket.on('playgame', handlePlayGame);
+    io.socket.on('addPoint', handleAddPoint);
+    io.socket.on('play', handlePlayGame);
     io.socket.on('updatescore', handleUpdateScore);
     io.socket.on('message', handleMessage);
 }
@@ -147,8 +147,10 @@ function handleClearLapangan(data) {
     }
 }
 
-function handlePlay(data) {
-    console.log(`\n${C.blue}▶️  PLAY:${C.reset}`, JSON.stringify(data));
+function handleAddPoint(data) {
+    //console.log(`\n${C.blue}▶️  PLAY:${C.reset}`, JSON.stringify(data));
+    let preview = JSON.stringify(data);
+    console.log(`\n${C.blue}▶️  addPOINT:${C.reset}`, `==>${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
     
     const event = {
         type: 'play',
@@ -169,7 +171,8 @@ function handlePlay(data) {
 
 function handlePlayGame(data) {
     logHeader('🎯 PLAYGAME');
-    console.log(JSON.stringify(data, null, 2));
+    let preview = JSON.stringify(data);
+    console.log(`\n${C.blue}▶️  Play-New-Game:${C.reset}`, `==>${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
     
     const event = {
         type: 'playgame',
@@ -270,6 +273,8 @@ function joinRoom(io, lapangan) {
                         joinedAt: getWIBTimestamp()
                     };
                 }
+                //console.log('BODYYYY', body);
+                //console.log('response', response);
                 
                 // Store initial data if returned
                 if (body && Object.keys(body).length > 0) {
