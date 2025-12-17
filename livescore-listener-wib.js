@@ -115,11 +115,10 @@ async function onConnected(io) {
 
 function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
-    
-    io.socket.on('clearLapangan', handleClearLapangan);
-    io.socket.on('addPoint', handleAddPoint);
+
+    io.socket.on('addPoint', handleUpdateScore);
     io.socket.on('play', handlePlayGame);
-    io.socket.on('updatescore', handleUpdateScore);
+    io.socket.on('clearLapangan', handleClearLapangan);
     io.socket.on('message', handleMessage);
 }
 
@@ -147,7 +146,7 @@ function handleClearLapangan(data) {
     }
 }
 
-function handleAddPoint(data) {
+function handleUpdateScore(data) {
     //console.log(`\n${C.blue}▶️  PLAY:${C.reset}`, JSON.stringify(data));
     let preview = JSON.stringify(data);
     console.log(`\n${C.blue}▶️  addPOINT:${C.reset}`, `==>${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
@@ -197,39 +196,6 @@ function handlePlayGame(data) {
     matchData[lapangan].initialData.match = data;
 }
 
-function handleUpdateScore(data) {
-    console.log(`\n${C.yellow}📊 UPDATESCORE:${C.reset}`, JSON.stringify(data));
-    
-    const event = {
-        type: 'updatescore',
-        data: data,
-        timestamp: new Date().toISOString()
-    };
-    eventHistory.push(event);
-    
-    // Store score data
-    const lapangan = data.lapangan || data[0]?.lapangan || 'unknown';
-    if (!matchData[lapangan]) {
-        matchData[lapangan] = { scores: [], events: [] };
-    }
-    
-    // Add score to history
-    matchData[lapangan].scores.push({
-        data: data,
-        timestamp: getWIBTimestamp()
-    });
-    
-    // Update current score
-    matchData[lapangan].currentScore = data;
-    matchData[lapangan].lastUpdate = getWIBTimestamp();
-    matchData[lapangan].status = 'playing';
-    
-    // Also update score in initialData.match if it exists (for backward compatibility)
-    if (matchData[lapangan].initialData && matchData[lapangan].initialData.match) {
-        // Update score fields in the match object
-        Object.assign(matchData[lapangan].initialData.match, data);
-    }
-}
 
 function handleMessage(data) {
     console.log(`\n${C.magenta}📨 MESSAGE:${C.reset}`, JSON.stringify(data));
