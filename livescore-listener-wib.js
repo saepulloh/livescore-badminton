@@ -117,7 +117,7 @@ function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
     
     io.socket.on('clearLapangan', handleClearLapangan);
-    io.socket.on('play', handlePlay);
+    io.socket.on('addPoint', handlePlay);
     io.socket.on('playgame', handlePlayGame);
     io.socket.on('updatescore', handleUpdateScore);
     io.socket.on('message', handleMessage);
