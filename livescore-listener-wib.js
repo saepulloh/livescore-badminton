@@ -515,7 +515,7 @@ function startHttpServer() {
                     };
                     
                     // Return WITHOUT array wrapper and minimal wrapper
-                    res.end(JSON.stringify(vmixData, null, 2));
+                    res.end(JSON.stringify([vmixData], null, 2));
                 } else {
                     res.writeHead(404);
                     res.end(JSON.stringify({
