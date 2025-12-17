@@ -134,7 +134,7 @@ function setupBroadcastListeners(io) {
 // EVENT HANDLERS - Store data in memory
 // ============================================
 function handleClearLapangan(data) {
-    console.log(`\n${C.green}🏁 CLEARLAPANGAN:${C.reset}`, JSON.stringify(data));
+    console.log(`\n${C.green}🏁 CLEARLAPANGAN - Match Finished:${C.reset}`, JSON.stringify(data));
     
     const event = {
         type: 'clearLapangan',
@@ -148,9 +148,17 @@ function handleClearLapangan(data) {
     
     // Clear match data for this lapangan
     if (matchData[lapangan]) {
+        // Simpan final score sebelum clear
+        matchData[lapangan].finalScore = matchData[lapangan].currentScore ? {...matchData[lapangan].currentScore} : null;
         matchData[lapangan].status = 'finished';
         matchData[lapangan].lastUpdate = getWIBTimestamp();
         matchData[lapangan].finishData = data;
+        
+        console.log(`   ✅ ${C.yellow}Match finished di court ${lapangan}${C.reset}`);
+        
+        // Optional: Clear currentScore agar ready untuk match berikutnya
+        // Uncomment jika ingin auto-clear setelah match selesai
+        // matchData[lapangan].currentScore = null;
     }
 }
 
@@ -202,7 +210,7 @@ function handleUpdateScore(data) {
 }
 
 function handlePlayGame(data) {
-    logHeader('🎯 PLAYGAME');
+    logHeader('🎯 PLAYGAME - NEW MATCH');
     let preview = JSON.stringify(data);
     console.log(`\n${C.blue}▶️  Play-New-Game:${C.reset}`, `==>${preview.substring(0, 100)}${preview.length > 100 ? '...' : ''}`);
     
@@ -228,22 +236,23 @@ function handlePlayGame(data) {
     }
     matchData[lapangan].initialData.match = data;
     
-    // PENTING: Initialize currentScore dengan score dari matchInfo jika ada
-    if (!matchData[lapangan].currentScore) {
-        matchData[lapangan].currentScore = {
-            team1set1: data.team1set1 ?? 0,
-            team2set1: data.team2set1 ?? 0,
-            team1set2: data.team1set2 ?? 0,
-            team2set2: data.team2set2 ?? 0,
-            team1set3: data.team1set3 ?? 0,
-            team2set3: data.team2set3 ?? 0,
-            team1point: data.team1point ?? 0,
-            team2point: data.team2point ?? 0,
-            pemenang: data.pemenang ?? 0,
-            retired: data.retired ?? 0,
-            durasi: data.durasi ?? 0
-        };
-    }
+    // PENTING: RESET currentScore untuk match baru - SELALU reset, bukan cek if
+    // Ini memastikan score dari match lama tidak terbawa ke match baru
+    matchData[lapangan].currentScore = {
+        team1set1: data.team1set1 ?? 0,
+        team2set1: data.team2set1 ?? 0,
+        team1set2: data.team1set2 ?? 0,
+        team2set2: data.team2set2 ?? 0,
+        team1set3: data.team1set3 ?? 0,
+        team2set3: data.team2set3 ?? 0,
+        team1point: data.team1point ?? 0,
+        team2point: data.team2point ?? 0,
+        pemenang: data.pemenang ?? 0,
+        retired: data.retired ?? 0,
+        durasi: data.durasi ?? 0
+    };
+    
+    console.log(`   🔄 ${C.green}Score RESET untuk match baru di court ${lapangan}${C.reset}`);
 }
 
 
@@ -353,6 +362,7 @@ ${C.cyan}═══════════════════════�
    ${C.cyan}Other Endpoints:${C.reset}
    • /listpertandingan  → All match data
    • /lapangan?id=N     → Specific court (full data)
+   • /debug?id=N        → Debug internal data structure
    • /status            → Connection status
    • /events            → Event history
 
@@ -444,6 +454,43 @@ function startHttpServer() {
                     }, null, 2));
                 }
 
+                break;
+                
+            case '/debug':
+                // Debug endpoint - show internal data structure
+                if (lap && matchData[lap]) {
+                    res.writeHead(200);
+                    const courtData = matchData[lap];
+                    res.end(JSON.stringify({
+                        success: true,
+                        timestamp: getWIBTimestamp(),
+                        lapangan: lap,
+                        debug_info: {
+                            status: courtData.status,
+                            has_matchInfo: !!courtData.matchInfo,
+                            has_currentScore: !!courtData.currentScore,
+                            has_playData: !!courtData.playData,
+                            has_finalScore: !!courtData.finalScore,
+                            lastUpdate: courtData.lastUpdate
+                        },
+                        matchInfo: courtData.matchInfo || null,
+                        currentScore: courtData.currentScore || null,
+                        finalScore: courtData.finalScore || null,
+                        playData_preview: courtData.playData ? 
+                            JSON.stringify(courtData.playData).substring(0, 200) + '...' : null,
+                        recent_events: eventHistory.filter(e => {
+                            const eventData = e.data[0] || e.data;
+                            return eventData.lapangan === lap || e.data.lapangan === lap;
+                        }).slice(-5)
+                    }, null, 2));
+                } else {
+                    res.writeHead(404);
+                    res.end(JSON.stringify({
+                        success: false,
+                        error: 'Lapangan not found',
+                        available: Object.keys(matchData)
+                    }, null, 2));
+                }
                 break;
             case '/vmix':
                 // Return specific lapangan data (real-time updated)
@@ -655,6 +702,7 @@ function startHttpServer() {
                         '/status': 'Get connection status and configuration',
                         '/events': 'Get event history (use ?limit=N for pagination)',
                         '/lapangan?id=N': 'Get data for specific court',
+                        '/debug?id=N': 'Debug internal data structure for specific court',
                         '/vmix?id=N': 'Get match data (nested structure)',
                         '/vmix-flat?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED FOR VMIX',
                         '/vmix-xml?id=N': 'Get vMix-friendly XML data',
@@ -680,7 +728,8 @@ function startHttpServer() {
                         '/listpertandingan', 
                         '/status', 
                         '/events', 
-                        '/lapangan?id=N', 
+                        '/lapangan?id=N',
+                        '/debug?id=N (debugging)',
                         '/vmix-flat?id=N (vMix recommended)', 
                         '/vmix-xml?id=N',
                         '/clear'
