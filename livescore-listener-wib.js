@@ -116,8 +116,16 @@ async function onConnected(io) {
 function setupBroadcastListeners(io) {
     log(C.green, '✅ Setting up listeners...');
 
+    // Listen untuk berbagai variasi event score update
     io.socket.on('addPoint', handleUpdateScore);
+    io.socket.on('updatescore', handleUpdateScore);  // Real-time score updates
+    io.socket.on('updateScore', handleUpdateScore);  // Case variation
+    
+    // Listen untuk event play/playgame
     io.socket.on('play', handlePlayGame);
+    io.socket.on('playgame', handlePlayGame);
+    
+    // Event lainnya
     io.socket.on('clearLapangan', handleClearLapangan);
     io.socket.on('message', handleMessage);
 }
@@ -147,31 +155,56 @@ function handleClearLapangan(data) {
 }
 
 function handleUpdateScore(data) {
-    //console.log(`\n${C.blue}▶️  PLAY:${C.reset}`, JSON.stringify(data));
     let preview = JSON.stringify(data);
-    console.log(`\n${C.blue}▶️  addPOINT:${C.reset}`, `==>${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
+    console.log(`\n${C.blue}📊 UPDATE SCORE:${C.reset}`, `==>${preview.substring(0, 100)}${preview.length > 100 ? '...' : ''}`);
     
     const event = {
-        type: 'play',
+        type: 'updatescore',
         data: data,
         timestamp: new Date().toISOString()
     };
     eventHistory.push(event);
     
-    // Store play data
+    // Extract lapangan
     const lapangan = data.lapangan || data[0]?.lapangan || 'unknown';
+    
+    // Initialize if not exists
     if (!matchData[lapangan]) {
         matchData[lapangan] = { scores: [], events: [] };
     }
+    
+    // Store the complete update data
     matchData[lapangan].playData = data;
     matchData[lapangan].lastUpdate = getWIBTimestamp();
     matchData[lapangan].status = 'playing';
+    
+    // PENTING: Extract dan simpan current score
+    // Data bisa dalam berbagai format, kita extract semua kemungkinan
+    const scoreData = {
+        team1set1: data.team1set1 ?? data.team1Set1 ?? null,
+        team2set1: data.team2set1 ?? data.team2Set1 ?? null,
+        team1set2: data.team1set2 ?? data.team1Set2 ?? null,
+        team2set2: data.team2set2 ?? data.team2Set2 ?? null,
+        team1set3: data.team1set3 ?? data.team1Set3 ?? null,
+        team2set3: data.team2set3 ?? data.team2Set3 ?? null,
+        team1point: data.team1point ?? data.team1Point ?? data.team1_point ?? null,
+        team2point: data.team2point ?? data.team2Point ?? data.team2_point ?? null,
+        pemenang: data.pemenang ?? data.winner ?? null,
+        retired: data.retired ?? null,
+        durasi: data.durasi ?? data.duration ?? null
+    };
+    
+    // Simpan ke currentScore - ini yang akan digunakan oleh vmix endpoint
+    matchData[lapangan].currentScore = scoreData;
+    
+    // Log untuk debugging
+    console.log(`   📍 Court ${lapangan}: Set1(${scoreData.team1set1}-${scoreData.team2set1}) Set2(${scoreData.team1set2}-${scoreData.team2set2}) Set3(${scoreData.team1set3}-${scoreData.team2set3}) Current(${scoreData.team1point}-${scoreData.team2point})`);
 }
 
 function handlePlayGame(data) {
     logHeader('🎯 PLAYGAME');
     let preview = JSON.stringify(data);
-    console.log(`\n${C.blue}▶️  Play-New-Game:${C.reset}`, `==>${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
+    console.log(`\n${C.blue}▶️  Play-New-Game:${C.reset}`, `==>${preview.substring(0, 100)}${preview.length > 100 ? '...' : ''}`);
     
     const event = {
         type: 'playgame',
@@ -194,6 +227,23 @@ function handlePlayGame(data) {
         matchData[lapangan].initialData = {};
     }
     matchData[lapangan].initialData.match = data;
+    
+    // PENTING: Initialize currentScore dengan score dari matchInfo jika ada
+    if (!matchData[lapangan].currentScore) {
+        matchData[lapangan].currentScore = {
+            team1set1: data.team1set1 ?? 0,
+            team2set1: data.team2set1 ?? 0,
+            team1set2: data.team1set2 ?? 0,
+            team2set2: data.team2set2 ?? 0,
+            team1set3: data.team1set3 ?? 0,
+            team2set3: data.team2set3 ?? 0,
+            team1point: data.team1point ?? 0,
+            team2point: data.team2point ?? 0,
+            pemenang: data.pemenang ?? 0,
+            retired: data.retired ?? 0,
+            durasi: data.durasi ?? 0
+        };
+    }
 }
 
 
@@ -239,8 +289,6 @@ function joinRoom(io, lapangan) {
                         joinedAt: getWIBTimestamp()
                     };
                 }
-                //console.log('BODYYYY', body);
-                //console.log('response', response);
                 
                 // Store initial data if returned
                 if (body && Object.keys(body).length > 0) {
@@ -248,6 +296,22 @@ function joinRoom(io, lapangan) {
                     console.log(`      └─ ${preview.substring(0, 70)}${preview.length > 70 ? '...' : ''}`);
                     matchData[lapangan].initialData = body;
                     matchData[lapangan].lastUpdate = getWIBTimestamp();
+                    
+                    // Jika ada match info di initial data, set sebagai matchInfo
+                    if (body.match) {
+                        matchData[lapangan].matchInfo = body.match;
+                        // Initialize currentScore dari match info
+                        matchData[lapangan].currentScore = {
+                            team1set1: body.match.team1set1 ?? 0,
+                            team2set1: body.match.team2set1 ?? 0,
+                            team1set2: body.match.team1set2 ?? 0,
+                            team2set2: body.match.team2set2 ?? 0,
+                            team1set3: body.match.team1set3 ?? 0,
+                            team2set3: body.match.team2set3 ?? 0,
+                            team1point: body.match.team1point ?? 0,
+                            team2point: body.match.team2point ?? 0
+                        };
+                    }
                 }
             } else {
                 const status = response ? response.statusCode : 'timeout';
@@ -275,9 +339,9 @@ ${C.cyan}═══════════════════════�
 
 📡 Events:
    • ${C.green}clearLapangan${C.reset}  → Match finished
+   • ${C.blue}updatescore${C.reset}    → Real-time score updates ⭐
    • ${C.blue}play${C.reset}           → Dari joinRoomWasit
    • ${C.blue}playgame${C.reset}       → Match on court
-   • ${C.yellow}updatescore${C.reset}    → Real-time score
 
 🏟️  Rooms: ${joinedRooms.join(', ')}
 
@@ -439,6 +503,7 @@ function startHttpServer() {
                     const team2 = matchInfo.team2 || {};
                     
                     // Build flat structure for vMix
+                    // PRIORITAS: currentScore > matchInfo > default 0
                     const vmixData = {
                         // Court info
                         court: lap,
@@ -463,7 +528,8 @@ function startHttpServer() {
                         team2_club: team2.player1_club || '',
                         team2_player2_name: team2.displayName2 || team2.lastname2 || '',
                         
-                        // Scores - from current score or match info
+                        // Scores - PRIORITAS DARI currentScore (real-time)
+                        // Gunakan nullish coalescing dengan prioritas: currentScore > matchInfo > 0
                         team1_set1: currentScore.team1set1 ?? matchInfo.team1set1 ?? 0,
                         team2_set1: currentScore.team2set1 ?? matchInfo.team2set1 ?? 0,
                         team1_set2: currentScore.team1set2 ?? matchInfo.team1set2 ?? 0,
@@ -471,14 +537,14 @@ function startHttpServer() {
                         team1_set3: currentScore.team1set3 ?? matchInfo.team1set3 ?? 0,
                         team2_set3: currentScore.team2set3 ?? matchInfo.team2set3 ?? 0,
                         
-                        // Current game scores (if available from updatescore)
-                        team1_current: currentScore.team1point || 0,
-                        team2_current: currentScore.team2point || 0,
+                        // Current game scores (dari updatescore)
+                        team1_current: currentScore.team1point ?? 0,
+                        team2_current: currentScore.team2point ?? 0,
                         
                         // Match status
-                        winner: matchInfo.pemenang || 0,
-                        retired: matchInfo.retired || 0,
-                        duration: matchInfo.durasi || 0,
+                        winner: currentScore.pemenang ?? matchInfo.pemenang ?? 0,
+                        retired: currentScore.retired ?? matchInfo.retired ?? 0,
+                        duration: currentScore.durasi ?? matchInfo.durasi ?? 0,
                         
                         // Metadata with WIB timezone
                         last_update: courtData.lastUpdate || getWIBTimestamp(),
@@ -510,7 +576,7 @@ function startHttpServer() {
                     const team1 = matchInfo.team1 || {};
                     const team2 = matchInfo.team2 || {};
                     
-                    // Build XML structure
+                    // Build XML structure - prioritas dari currentScore
                     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <match>
   <court>${lap}</court>
@@ -547,9 +613,9 @@ function startHttpServer() {
   </scores>
   
   <metadata>
-    <winner>${matchInfo.pemenang || 0}</winner>
-    <retired>${matchInfo.retired || 0}</retired>
-    <duration>${matchInfo.durasi || 0}</duration>
+    <winner>${currentScore.pemenang ?? matchInfo.pemenang ?? 0}</winner>
+    <retired>${currentScore.retired ?? matchInfo.retired ?? 0}</retired>
+    <duration>${currentScore.durasi ?? matchInfo.durasi ?? 0}</duration>
     <last_update>${courtData.lastUpdate || getWIBTimestamp()}</last_update>
     <update_time>${getWIBTimestampShort()}</update_time>
   </metadata>
