@@ -227,6 +227,7 @@ function handlePlayGame(data) {
         matchData[lapangan] = { scores: [], events: [] };
     }
     matchData[lapangan].matchInfo = data;
+    matchData[lapangan].playData = data;
     matchData[lapangan].lastUpdate = getWIBTimestamp();
     matchData[lapangan].status = 'on_court';
     
@@ -309,6 +310,7 @@ function joinRoom(io, lapangan) {
                     // Jika ada match info di initial data, set sebagai matchInfo
                     if (body.match) {
                         matchData[lapangan].matchInfo = body.match;
+                        matchData[lapangan].playData = body.match;
                         // Initialize currentScore dari match info
                         matchData[lapangan].currentScore = {
                             team1set1: body.match.team1set1 ?? 0,
@@ -545,12 +547,17 @@ function startHttpServer() {
                     const matchInfo = courtData.matchInfo || playData;
                     const currentScore = courtData.currentScore || {};
                     
+                    
                     // Extract team data
                     const team1 = matchInfo.team1 || {};
                     const team2 = matchInfo.team2 || {};
-                    
+                    console.log('serv_team', courtData.matchInfo.livematch[0].serv_team);
+                    //console.log('livematch', courtData.playData);
+                    //res.end(JSON.stringify(courtData.playData.livematch[0], null, 2));
                     // Build flat structure for vMix
                     // PRIORITAS: currentScore > matchInfo > default 0
+                    const servTeam = courtData.playData.livematch[0].serv_team || 0;
+                    
                     const vmixData = {
                         // Court info
                         court: lap,
@@ -568,6 +575,7 @@ function startHttpServer() {
                         team1_club: team1.player1_club || '',
                         team1_player2_name: team1.displayName2 || team1.lastname2 || '',
                         team1_displayName : (team1.displayName1 || '') +  (team1.displayName2 ? " / " + team1.displayName2 : ""),
+                        team1_serve : servTeam === 1,
                         
                         // Team 2
                         team2_name: team2.displayName1 || team2.lastname1 || '',
@@ -576,6 +584,7 @@ function startHttpServer() {
                         team2_club: team2.player1_club || '',
                         team2_player2_name: team2.displayName2 || team2.lastname2 || '',
                         team2_displayName : (team2.displayName1 || '') +  (team2.displayName2 ? " / " + team2.displayName2 : ""),
+                        team2_serve : servTeam === 2,
                         
                         
                         // Scores - PRIORITAS DARI currentScore (real-time)
