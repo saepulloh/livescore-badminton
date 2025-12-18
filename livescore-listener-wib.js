@@ -567,6 +567,7 @@ function startHttpServer() {
                         team1_lastname: team1.lastname1 || '',
                         team1_club: team1.player1_club || '',
                         team1_player2_name: team1.displayName2 || team1.lastname2 || '',
+                        team1_displayName : (team1.displayName1 || '') +  (team1.displayName2 ? " / " + team1.displayName2 : ""),
                         
                         // Team 2
                         team2_name: team2.displayName1 || team2.lastname1 || '',
@@ -574,6 +575,8 @@ function startHttpServer() {
                         team2_lastname: team2.lastname1 || '',
                         team2_club: team2.player1_club || '',
                         team2_player2_name: team2.displayName2 || team2.lastname2 || '',
+                        team2_displayName : (team2.displayName1 || '') +  (team2.displayName2 ? " / " + team2.displayName2 : ""),
+                        
                         
                         // Scores - PRIORITAS DARI currentScore (real-time)
                         // Gunakan nullish coalescing dengan prioritas: currentScore > matchInfo > 0
