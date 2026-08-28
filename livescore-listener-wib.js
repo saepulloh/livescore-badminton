@@ -430,6 +430,14 @@ function handleBereguUpdateScore(data, klasemenUid) {
         bereguData[lapangan] = { context: {}, liveScore: {}, status: 'playing', lastUpdate: null, lastContextFetch: null };
     }
 
+    // `data` = objek Pertandingan mentah dari PertandinganServices.getLiveMatchByMatchId
+    // (broadcast addPoint apa adanya, sama untuk individu & beregu — lihat
+    // PertandinganController.addPoint). `.populate('livematch')` SELALU jalan
+    // (guard !match.draw cuma mengosongkan team1/team2, bukan livematch), jadi
+    // serv_team di sini SELALU segar tiap poin — beda dari ctx.livematch yang
+    // cuma di-refresh lewat event liga* (batas partai/set, bukan tiap poin).
+    const liveLivematch = (Array.isArray(data.livematch) ? data.livematch[0] : data.livematch) || {};
+
     bereguData[lapangan].liveScore = {
         klasemen_uid: klasemenUid,
         team1set1: data.team1set1 ?? null,
@@ -442,7 +450,9 @@ function handleBereguUpdateScore(data, klasemenUid) {
         team2point: data.team2point ?? null,
         pemenang: data.pemenang ?? null,
         retired: data.retired ?? null,
-        durasi: data.durasi ?? data.duration ?? null
+        durasi: data.durasi ?? data.duration ?? null,
+        serv_team: liveLivematch.serv_team ?? null,
+        serv_player: liveLivematch.serv_player ?? null
     };
     bereguData[lapangan].status = 'playing';
     bereguData[lapangan].lastUpdate = getWIBTimestamp();
@@ -508,7 +518,10 @@ function buildBereguFlat(lap) {
         if (s1 || s2) { if (s1 > s2) setsWon1++; else if (s2 > s1) setsWon2++; }
     }
 
-    const servTeam = livematch.serv_team ?? 0;
+    // Prioritaskan live.serv_team (segar tiap poin, dari payload addPoint) di
+    // atas ctx.livematch.serv_team (cuma di-refresh lewat event liga*, batas
+    // partai/set) — lihat komentar di handleBereguUpdateScore.
+    const servTeam = live.serv_team ?? livematch.serv_team ?? 0;
     const set1 = setScore(1), set2 = setScore(2), set3 = setScore(3);
 
     return {
