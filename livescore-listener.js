@@ -478,19 +478,23 @@ function startHttpServer() {
                         round: matchInfo.round || '',
                         match_number: matchInfo.nr || '',
                         
-                        // Team 1
-                        team1_name: team1.displayName1 || team1.lastname1 || '',
-                        team1_firstname: team1.firstname1 || '',
-                        team1_lastname: team1.lastname1 || '',
-                        team1_club: team1.player1_club || '',
-                        team1_player2_name: team1.displayName2 || team1.lastname2 || '',
+                        // Team 1 — *_name = nama LENGKAP (pemain.nama), *_displayName = nama pendek (pemain.lastname)
+                        team1_player1_name: team1.lastname1 || '',
+                        team1_player1_displayName: team1.displayName1 || team1.lastname1 || '',
+                        team1_player1_club: team1.player1_club || '',
+                        team1_player2_name: team1.lastname2 || '',
+                        team1_player2_displayName: team1.displayName2 || team1.lastname2 || '',
+                        team1_player2_club: team1.player2_club || '',
+                        team1_displayName: (team1.displayName1 || '') + (team1.displayName2 ? " / " + team1.displayName2 : ""),
                         
                         // Team 2
-                        team2_name: team2.displayName1 || team2.lastname1 || '',
-                        team2_firstname: team2.firstname1 || '',
-                        team2_lastname: team2.lastname1 || '',
-                        team2_club: team2.player1_club || '',
-                        team2_player2_name: team2.displayName2 || team2.lastname2 || '',
+                        team2_player1_name: team2.lastname1 || '',
+                        team2_player1_displayName: team2.displayName1 || team2.lastname1 || '',
+                        team2_player1_club: team2.player1_club || '',
+                        team2_player2_name: team2.lastname2 || '',
+                        team2_player2_displayName: team2.displayName2 || team2.lastname2 || '',
+                        team2_player2_club: team2.player2_club || '',
+                        team2_displayName: (team2.displayName1 || '') + (team2.displayName2 ? " / " + team2.displayName2 : ""),
                         
                         // Scores - from current score or match info
                         team1_set1: currentScore.team1set1 ?? matchInfo.team1set1 ?? 0,
@@ -549,19 +553,25 @@ function startHttpServer() {
   <match_number>${matchInfo.nr || ''}</match_number>
   
   <team1>
-    <name>${team1.displayName1 || team1.lastname1 || ''}</name>
-    <firstname>${team1.firstname1 || ''}</firstname>
-    <lastname>${team1.lastname1 || ''}</lastname>
-    <club>${team1.player1_club || ''}</club>
-    <player2_name>${team1.displayName2 || team1.lastname2 || ''}</player2_name>
+    <player1_name>${team1.lastname1 || ''}</player1_name>
+    <player1_displayName>${team1.displayName1 || team1.lastname1 || ''}</player1_displayName>
+    <player1_club>${team1.player1_club || ''}</player1_club>
+    <player2_name>${team1.lastname2 || ''}</player2_name>
+    <player2_displayName>${team1.displayName2 || team1.lastname2 || ''}</player2_displayName>
+    <player2_club>${team1.player2_club || ''}</player2_club>
+    <displayName>${(team1.displayName1 || '') + (team1.displayName2 ? " / " + team1.displayName2 : "")}</displayName>
+    <serve>${(playData.livematch?.[0]?.serv_team || 0) === 1}</serve>
   </team1>
   
   <team2>
-    <name>${team2.displayName1 || team2.lastname1 || ''}</name>
-    <firstname>${team2.firstname1 || ''}</firstname>
-    <lastname>${team2.lastname1 || ''}</lastname>
-    <club>${team2.player1_club || ''}</club>
-    <player2_name>${team2.displayName2 || team2.lastname2 || ''}</player2_name>
+    <player1_name>${team2.lastname1 || ''}</player1_name>
+    <player1_displayName>${team2.displayName1 || team2.lastname1 || ''}</player1_displayName>
+    <player1_club>${team2.player1_club || ''}</player1_club>
+    <player2_name>${team2.lastname2 || ''}</player2_name>
+    <player2_displayName>${team2.displayName2 || team2.lastname2 || ''}</player2_displayName>
+    <player2_club>${team2.player2_club || ''}</player2_club>
+    <displayName>${(team2.displayName1 || '') + (team2.displayName2 ? " / " + team2.displayName2 : "")}</displayName>
+    <serve>${(playData.livematch?.[0]?.serv_team || 0) === 2}</serve>
   </team2>
   
   <scores>
