@@ -110,23 +110,39 @@ Make sure the data appears like this:
 [
   {
     "court": "1",
-    "status": "playing",
-    "team1_player1_name": "Muhammad Rizky",
-    "team1_player1_displayName": "Rizky",
-    "team1_player1_club": "Jawa Tengah",
-    "team1_displayName": "Rizky",
+    "status": "on_court",
+    "tournament_name": "XD",
+    "round": "R1",
+    "match_number": 2,
+    "team1_player1_name": "Kleopas Binar Putra Prakoso",
+    "team1_player1_displayName": "Prakoso",
+    "team1_player1_club": "INA",
+    "team1_player2_name": "Meisa Rizka Fitria",
+    "team1_player2_displayName": "Fitria",
+    "team1_player2_club": "INA",
+    "team1_displayName": "Prakoso / Fitria",
     "team1_serve": true,
-    "team2_player1_name": "Akmal Fauzi",
-    "team2_player1_displayName": "Akmal",
-    "team2_player1_club": "Jawa Barat",
-    "team2_displayName": "Akmal",
+    "team2_player1_name": "Julius Villabrille",
+    "team2_player1_displayName": "Villabrille",
+    "team2_player1_club": "PHI",
+    "team2_player2_name": "Hernandez Andrea Princess",
+    "team2_player2_displayName": "Hernandez",
+    "team2_player2_club": "PHI",
+    "team2_displayName": "Villabrille / Hernandez",
     "team2_serve": false,
     "team1_set1": 21,
     "team2_set1": 19,
-    "team1_set2": 15,
+    "team1_set2": 18,
     "team2_set2": 21,
-    "team1_current": 11,
-    "team2_current": 8
+    "team1_set3": 21,
+    "team2_set3": 14,
+    "team1_current": 0,
+    "team2_current": 0,
+    "winner": 1,
+    "retired": 0,
+    "duration": 45,
+    "last_update": "10 Okt 2026, 15:33:58 WIB",
+    "update_time": "15:34:04"
   }
 ]
 ```
@@ -157,7 +173,7 @@ Status       → status
 
 **Team event (beregu) extras:**
 ```
-Match Type   → partai_label    (e.g. "Ganda Putra")
+Match Type   → partai_label    (e.g. "Mixed Doubles")
 Match No.    → current_set
 Tie Score    → sets_won_team1 - sets_won_team2
 ```
@@ -237,50 +253,50 @@ It will produce XML like:
 <?xml version="1.0" encoding="UTF-8"?>
 <match>
   <court>1</court>
-  <status>playing</status>
-  <tournament>TTA Divisi I</tournament>
-  <round>R2</round>
-  <match_number>39</match_number>
+  <status>on_court</status>
+  <tournament>XD</tournament>
+  <round>R1</round>
+  <match_number>2</match_number>
 
   <team1>
-    <player1_name>Muhammad Rizky</player1_name>
-    <player1_displayName>Rizky</player1_displayName>
-    <player1_club>Jawa Tengah</player1_club>
-    <player2_name></player2_name>
-    <player2_displayName></player2_displayName>
-    <player2_club></player2_club>
-    <displayName>Rizky</displayName>
+    <player1_name>Kleopas Binar Putra Prakoso</player1_name>
+    <player1_displayName>Prakoso</player1_displayName>
+    <player1_club>INA</player1_club>
+    <player2_name>Meisa Rizka Fitria</player2_name>
+    <player2_displayName>Fitria</player2_displayName>
+    <player2_club>INA</player2_club>
+    <displayName>Prakoso / Fitria</displayName>
     <serve>true</serve>
   </team1>
 
   <team2>
-    <player1_name>Akmal Fauzi</player1_name>
-    <player1_displayName>Akmal</player1_displayName>
-    <player1_club>Jawa Barat</player1_club>
-    <player2_name></player2_name>
-    <player2_displayName></player2_displayName>
-    <player2_club></player2_club>
-    <displayName>Akmal</displayName>
+    <player1_name>Julius Villabrille</player1_name>
+    <player1_displayName>Villabrille</player1_displayName>
+    <player1_club>PHI</player1_club>
+    <player2_name>Hernandez Andrea Princess</player2_name>
+    <player2_displayName>Hernandez</player2_displayName>
+    <player2_club>PHI</player2_club>
+    <displayName>Villabrille / Hernandez</displayName>
     <serve>false</serve>
   </team2>
 
   <scores>
     <team1_set1>21</team1_set1>
     <team2_set1>19</team2_set1>
-    <team1_set2>0</team1_set2>
-    <team2_set2>0</team2_set2>
-    <team1_set3>0</team1_set3>
-    <team2_set3>0</team2_set3>
-    <team1_current>11</team1_current>
-    <team2_current>8</team2_current>
+    <team1_set2>18</team1_set2>
+    <team2_set2>21</team2_set2>
+    <team1_set3>21</team1_set3>
+    <team2_set3>14</team2_set3>
+    <team1_current>0</team1_current>
+    <team2_current>0</team2_current>
   </scores>
 
   <metadata>
-    <winner>0</winner>
+    <winner>1</winner>
     <retired>0</retired>
     <duration>45</duration>
-    <last_update>16 Des 2025, 14:30:04 WIB</last_update>
-    <update_time>14:30:04</update_time>
+    <last_update>10 Okt 2026, 15:33:58 WIB</last_update>
+    <update_time>15:34:04</update_time>
   </metadata>
 </match>
 ```
@@ -315,44 +331,39 @@ For **team events (beregu)** (`/vmix-xml-beregu?id=1`) the structure is the same
 [
   {
     "court": "1",
-    "status": "playing",
-    "tournament_name": "TTA Divisi I",
-    "round": "R2",
-    "match_number": "39",
-
-    "team1_player1_name": "Muhammad Nashrulloh Al-Habsyi",
-    "team1_player1_displayName": "Muhammad",
-    "team1_player1_club": "Jawa Tengah",
-    "team1_player2_name": "",
-    "team1_player2_displayName": "",
-    "team1_player2_club": "",
-    "team1_displayName": "Muhammad",
+    "status": "on_court",
+    "tournament_name": "XD",
+    "round": "R1",
+    "match_number": 2,
+    "team1_player1_name": "Kleopas Binar Putra Prakoso",
+    "team1_player1_displayName": "Prakoso",
+    "team1_player1_club": "INA",
+    "team1_player2_name": "Meisa Rizka Fitria",
+    "team1_player2_displayName": "Fitria",
+    "team1_player2_club": "INA",
+    "team1_displayName": "Prakoso / Fitria",
     "team1_serve": true,
-
-    "team2_player1_name": "Akmal Zaidan Pamuji",
-    "team2_player1_displayName": "Akmal",
-    "team2_player1_club": "Jawa Barat",
-    "team2_player2_name": "",
-    "team2_player2_displayName": "",
-    "team2_player2_club": "",
-    "team2_displayName": "Akmal",
+    "team2_player1_name": "Julius Villabrille",
+    "team2_player1_displayName": "Villabrille",
+    "team2_player1_club": "PHI",
+    "team2_player2_name": "Hernandez Andrea Princess",
+    "team2_player2_displayName": "Hernandez",
+    "team2_player2_club": "PHI",
+    "team2_displayName": "Villabrille / Hernandez",
     "team2_serve": false,
-
     "team1_set1": 21,
     "team2_set1": 19,
     "team1_set2": 18,
     "team2_set2": 21,
-    "team1_set3": 11,
-    "team2_set3": 8,
-
-    "team1_current": 11,
-    "team2_current": 8,
-
-    "winner": 0,
+    "team1_set3": 21,
+    "team2_set3": 14,
+    "team1_current": 0,
+    "team2_current": 0,
+    "winner": 1,
     "retired": 0,
     "duration": 45,
-    "last_update": "16 Des 2025, 14:30:04 WIB",
-    "update_time": "14:30:04"
+    "last_update": "10 Okt 2026, 15:33:58 WIB",
+    "update_time": "15:34:04"
   }
 ]
 ```
@@ -363,26 +374,26 @@ Same fields as individual, with these added at the end:
 [
   {
     "court": "1",
-    "status": "playing",
+    "status": "on_court",
     "match_number": 2,
-    "team1_player1_name": "Muhammad Rizky",
-    "team1_player1_displayName": "Rizky",
-    "team1_player1_club": "PB Djarum",
-    "team1_player2_name": "Fauzan Akbar",
-    "team1_player2_displayName": "Fauzan",
-    "team1_player2_club": "PB Djarum",
-    "team1_displayName": "Rizky / Fauzan",
+    "team1_player1_name": "Kleopas Binar Putra Prakoso",
+    "team1_player1_displayName": "Prakoso",
+    "team1_player1_club": "INA",
+    "team1_player2_name": "Meisa Rizka Fitria",
+    "team1_player2_displayName": "Fitria",
+    "team1_player2_club": "INA",
+    "team1_displayName": "Prakoso / Fitria",
     "team1_serve": true,
 
     "...": "(score fields, winner, duration, etc. same as individual)",
 
-    "partai_type": "MD",
-    "partai_label": "Ganda Putra",
-    "current_set": 2,
+    "partai_type": "XD",
+    "partai_label": "Mixed Doubles",
+    "current_set": 3,
     "sets_won_team1": 1,
-    "sets_won_team2": 0,
-    "last_update": "16 Des 2025, 14:30:04 WIB",
-    "update_time": "14:30:04"
+    "sets_won_team2": 1,
+    "last_update": "10 Okt 2026, 15:33:58 WIB",
+    "update_time": "15:34:04"
   }
 ]
 ```
@@ -423,7 +434,7 @@ Same fields as individual, with these added at the end:
 | vMix Field | JSON Field | Description |
 |------------|-----------|-------------|
 | **Match Code** | `partai_type` | Alias of the match type (e.g. `MD`) |
-| **Match Type** | `partai_label` | Name of the match type (e.g. Ganda Putra) |
+| **Match Type** | `partai_label` | Name of the match type (e.g. Mixed Doubles) |
 | **Current Match/Set** | `current_set` | The set/match currently in progress |
 | **Sets Won T1** | `sets_won_team1` | Number of sets won by team 1 |
 | **Sets Won T2** | `sets_won_team2` | Number of sets won by team 2 |
@@ -502,30 +513,30 @@ Serve is taken from the data of each point (`addPoint`). Make sure the referee h
 
 ### Minimalist
 ```
-┌──────────────────────────────┐
-│  Muhammad (Jawa Tengah)      │
-│  21 - 19  |  18 - 21  | 11-8 │
-│                               │
-│  Akmal (Jawa Barat)          │
-└──────────────────────────────┘
+┌────────────────────────────────────┐
+│  Prakoso / Fitria (INA)            │
+│  21 - 19  |  18 - 21  |  21 - 14   │
+│                                    │
+│  Villabrille / Hernandez (PHI)     │
+└────────────────────────────────────┘
 ```
 
 ### Professional
 ```
 ╔═══════════════════════════════════════╗
-║  TTA DIVISI I - R2                    ║
+║  XD - R1                              ║
 ║  Court 1                              ║
 ╠═══════════════════════════════════════╣
 ║                                       ║
-║  🏸 Muhammad                          ║
-║     Jawa Tengah                       ║
+║  🏸 Prakoso / Fitria                  ║
+║     INA                               ║
 ║                                       ║
-║     21    18    11                    ║
+║     21    18    21                    ║
 ║     ──    ──    ──                    ║
-║     19    21     8                    ║
+║     19    21    14                    ║
 ║                                       ║
-║  🏸 Akmal                             ║
-║     Jawa Barat                        ║
+║  🏸 Villabrille / Hernandez           ║
+║     PHI                               ║
 ║                                       ║
 ╚═══════════════════════════════════════╝
 ```

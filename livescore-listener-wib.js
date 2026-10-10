@@ -701,58 +701,58 @@ function isTestMode(query) {
     return query.test === 'true' || query.test === '1';
 }
 
-// Same shape as matchData[court]; a doubles match so player2 fields are filled
+// Same shape as matchData[court]; a mixed doubles match so player2 fields are filled
 const DUMMY_COURT_DATA = {
-    status: 'playing',
+    status: 'on_court',
     lastUpdate: null,
     matchInfo: {
-        kelompok_pertandingan: { nama: "TEST - Men's Doubles" },
-        round: 'SF',
-        nr: 12,
+        kelompok_pertandingan: { nama: 'XD' },
+        round: 'R1',
+        nr: 2,
         team1: {
-            lastname1: 'Muhammad Rizky Pratama', displayName1: 'Rizky', player1_club: 'PB Djarum Kudus',
-            lastname2: 'Fauzan Akbar Maulana', displayName2: 'Fauzan', player2_club: 'PB Djarum Kudus'
+            lastname1: 'Kleopas Binar Putra Prakoso', displayName1: 'Prakoso', player1_club: 'INA',
+            lastname2: 'Meisa Rizka Fitria', displayName2: 'Fitria', player2_club: 'INA'
         },
         team2: {
-            lastname1: 'Akmal Zaidan Pamuji', displayName1: 'Akmal', player1_club: 'PB Jaya Raya Jakarta',
-            lastname2: 'Bagas Satria Nugraha', displayName2: 'Bagas', player2_club: 'PB Jaya Raya Jakarta'
+            lastname1: 'Julius Villabrille', displayName1: 'Villabrille', player1_club: 'PHI',
+            lastname2: 'Hernandez Andrea Princess', displayName2: 'Hernandez', player2_club: 'PHI'
         }
     },
     playData: { livematch: [{ serv_team: 1 }] },
     currentScore: {
         team1set1: 21, team2set1: 19,
-        team1set2: 11, team2set2: 8,
-        team1set3: 0, team2set3: 0,
-        team1point: 11, team2point: 8,
-        pemenang: 0, retired: 0, durasi: 32
+        team1set2: 18, team2set2: 21,
+        team1set3: 21, team2set3: 14,
+        team1point: 0, team2point: 0,
+        pemenang: 1, retired: 0, durasi: 45
     }
 };
 
 // Same shape as bereguData[court]
 const DUMMY_BEREGU_DATA = {
-    status: 'playing',
+    status: 'on_court',
     lastUpdate: null,
     context: {
-        club1_name: 'PB Djarum Kudus',
-        club2_name: 'PB Jaya Raya Jakarta',
+        club1_name: 'INA',
+        club2_name: 'PHI',
         klasemenMatch: { club1: 'club-1', club2: 'club-2' },
-        livematch: { current_set: 2, current_partai: 2, serv_team: 1 },
+        livematch: { current_set: 3, current_partai: 2, serv_team: 1 },
         pertandingan: {},
-        partai: [{ set_no: 2, partai_no: 2, partai_type: 'MD' }],
-        partaiCategories: [{ alias: 'MD', nama: "Men's Doubles" }],
+        partai: [{ set_no: 3, partai_no: 2, partai_type: 'XD' }],
+        partaiCategories: [{ alias: 'XD', nama: 'Mixed Doubles' }],
         lineup: [
-            { club: 'club-1', set_no: 2, partai_type: 'MD', slot: 1, pemain_nama: 'Muhammad Rizky Pratama', pemain_lastname: 'Rizky' },
-            { club: 'club-1', set_no: 2, partai_type: 'MD', slot: 2, pemain_nama: 'Fauzan Akbar Maulana', pemain_lastname: 'Fauzan' },
-            { club: 'club-2', set_no: 2, partai_type: 'MD', slot: 1, pemain_nama: 'Akmal Zaidan Pamuji', pemain_lastname: 'Akmal' },
-            { club: 'club-2', set_no: 2, partai_type: 'MD', slot: 2, pemain_nama: 'Bagas Satria Nugraha', pemain_lastname: 'Bagas' }
+            { club: 'club-1', set_no: 3, partai_type: 'XD', slot: 1, pemain_nama: 'Kleopas Binar Putra Prakoso', pemain_lastname: 'Prakoso' },
+            { club: 'club-1', set_no: 3, partai_type: 'XD', slot: 2, pemain_nama: 'Meisa Rizka Fitria', pemain_lastname: 'Fitria' },
+            { club: 'club-2', set_no: 3, partai_type: 'XD', slot: 1, pemain_nama: 'Julius Villabrille', pemain_lastname: 'Villabrille' },
+            { club: 'club-2', set_no: 3, partai_type: 'XD', slot: 2, pemain_nama: 'Hernandez Andrea Princess', pemain_lastname: 'Hernandez' }
         ]
     },
     liveScore: {
         team1set1: 21, team2set1: 19,
-        team1set2: 11, team2set2: 8,
-        team1set3: 0, team2set3: 0,
-        team1point: 11, team2point: 8,
-        pemenang: 0, durasi: 32, serv_team: 1
+        team1set2: 18, team2set2: 21,
+        team1set3: 21, team2set3: 14,
+        team1point: 0, team2point: 0,
+        pemenang: 1, durasi: 45, serv_team: 1
     }
 };
 

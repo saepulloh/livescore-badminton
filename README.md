@@ -134,42 +134,45 @@ curl http://localhost:6969/vmix-flat?id=1
 [
   {
     "court": "1",
-    "status": "playing",
-    "tournament_name": "TTA Divisi I",
-    "round": "R2",
-    "match_number": 12,
-    "team1_player1_name": "Muhammad Rizky",
-    "team1_player1_displayName": "Rizky",
-    "team1_player1_club": "Jawa Tengah",
-    "team1_player2_name": "",
-    "team1_player2_displayName": "",
-    "team1_player2_club": "",
-    "team1_displayName": "Rizky",
+    "status": "on_court",
+    "tournament_name": "XD",
+    "round": "R1",
+    "match_number": 2,
+    "team1_player1_name": "Kleopas Binar Putra Prakoso",
+    "team1_player1_displayName": "Prakoso",
+    "team1_player1_club": "INA",
+    "team1_player2_name": "Meisa Rizka Fitria",
+    "team1_player2_displayName": "Fitria",
+    "team1_player2_club": "INA",
+    "team1_displayName": "Prakoso / Fitria",
     "team1_serve": true,
-    "team2_player1_name": "Akmal Fauzi",
-    "team2_player1_displayName": "Akmal",
-    "team2_player1_club": "Jawa Barat",
-    "team2_displayName": "Akmal",
+    "team2_player1_name": "Julius Villabrille",
+    "team2_player1_displayName": "Villabrille",
+    "team2_player1_club": "PHI",
+    "team2_player2_name": "Hernandez Andrea Princess",
+    "team2_player2_displayName": "Hernandez",
+    "team2_player2_club": "PHI",
+    "team2_displayName": "Villabrille / Hernandez",
     "team2_serve": false,
     "team1_set1": 21,
     "team2_set1": 19,
-    "team1_set2": 0,
-    "team2_set2": 0,
-    "team1_set3": 0,
-    "team2_set3": 0,
-    "team1_current": 11,
-    "team2_current": 8,
-    "winner": 0,
+    "team1_set2": 18,
+    "team2_set2": 21,
+    "team1_set3": 21,
+    "team2_set3": 14,
+    "team1_current": 0,
+    "team2_current": 0,
+    "winner": 1,
     "retired": 0,
-    "duration": 1234,
-    "last_update": "16 Des 2025, 14:30:04 WIB",
-    "update_time": "14:30:04"
+    "duration": 45,
+    "last_update": "10 Okt 2026, 15:33:58 WIB",
+    "update_time": "15:34:04"
   }
 ]
 ```
 
 > For doubles, `player2_*` is filled in and `teamN_displayName` is joined with ` / `
-> (example: `"Rizky / Fauzan"`).
+> (example: `"Prakoso / Fitria"`).
 
 ---
 
@@ -183,30 +186,30 @@ curl http://localhost:6969/vmix-xml?id=1
 ```xml
 <match>
   <court>1</court>
-  <status>playing</status>
-  <tournament>TTA Divisi I</tournament>
-  <round>R2</round>
-  <match_number>12</match_number>
+  <status>on_court</status>
+  <tournament>XD</tournament>
+  <round>R1</round>
+  <match_number>2</match_number>
   <team1>
-    <player1_name>Muhammad Rizky</player1_name>
-    <player1_displayName>Rizky</player1_displayName>
-    <player1_club>Jawa Tengah</player1_club>
-    <displayName>Rizky</displayName>
+    <player1_name>Kleopas Binar Putra Prakoso</player1_name>
+    <player1_displayName>Prakoso</player1_displayName>
+    <player1_club>INA</player1_club>
+    <displayName>Prakoso / Fitria</displayName>
     <serve>true</serve>
   </team1>
   <team2>...</team2>
   <scores>
     <team1_set1>21</team1_set1>
     <team2_set1>19</team2_set1>
-    <team1_current>11</team1_current>
-    <team2_current>8</team2_current>
+    <team1_current>0</team1_current>
+    <team2_current>0</team2_current>
   </scores>
   <metadata>
-    <winner>0</winner>
+    <winner>1</winner>
     <retired>0</retired>
-    <duration>1234</duration>
-    <last_update>16 Des 2025, 14:30:04 WIB</last_update>
-    <update_time>14:30:04</update_time>
+    <duration>45</duration>
+    <last_update>10 Okt 2026, 15:33:58 WIB</last_update>
+    <update_time>15:34:04</update_time>
   </metadata>
 </match>
 ```
@@ -276,14 +279,14 @@ curl "http://localhost:6969/vmix-xml-beregu?id=1&test=true"
 |-------|-------------|---------|
 | `court` | Court number | `"1"` |
 | `status` | Match status | `"waiting"`, `"on_court"`, `"playing"`, `"finished"` |
-| `tournament_name` | Tournament name (empty in team event) | `"TTA Divisi I"` |
+| `tournament_name` | Tournament name (empty in team event) | `"XD"` |
 | `round` | Round (empty in team event) | `"R2"`, `"QF"`, `"SF"`, `"F"` |
 | `match_number` | Match number (team event: partai number) | `12` |
-| `teamN_player1_name` | Full name of player 1 | `"Muhammad Rizky"` |
-| `teamN_player1_displayName` | Short name of player 1 | `"Rizky"` |
-| `teamN_player1_club` | Club of player 1 | `"Jawa Tengah"` |
-| `teamN_player2_name` / `_displayName` / `_club` | Player 2 (doubles) | `"Fauzan"` |
-| `teamN_displayName` | Team display name (doubles joined with ` / `) | `"Rizky / Fauzan"` |
+| `teamN_player1_name` | Full name of player 1 | `"Kleopas Binar Putra Prakoso"` |
+| `teamN_player1_displayName` | Short name of player 1 | `"Prakoso"` |
+| `teamN_player1_club` | Club of player 1 | `"INA"` |
+| `teamN_player2_name` / `_displayName` / `_club` | Player 2 (doubles) | `"Fitria"` |
+| `teamN_displayName` | Team display name (doubles joined with ` / `) | `"Prakoso / Fitria"` |
 | `team1_serve` / `team2_serve` | Team currently serving (boolean) | `true` |
 | `teamN_setM` | Score of set M (M = 1-3) | `21` |
 | `team1_current` / `team2_current` | Points in the current game | `11` / `8` |
@@ -299,8 +302,8 @@ curl "http://localhost:6969/vmix-xml-beregu?id=1&test=true"
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `partai_type` | Match type alias | `"MD"` |
-| `partai_label` | Match type name | `"Ganda Putra"` |
+| `partai_type` | Match type alias | `"XD"` |
+| `partai_label` | Match type name | `"Mixed Doubles"` |
 | `current_set` | Which set/partai is in progress | `2` |
 | `sets_won_team1` / `sets_won_team2` | Number of sets already won | `1` / `0` |
 
