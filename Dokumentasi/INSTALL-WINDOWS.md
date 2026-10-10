@@ -58,28 +58,6 @@ Jika Node.js belum terinstall:
 
 ---
 
-### Method 2: PowerShell Installer (Alternative)
-
-1. **Extract semua files** ke folder
-
-2. **Open PowerShell as Administrator:**
-   - Press `Win + X`
-   - Choose "Windows PowerShell (Admin)"
-
-3. **Navigate to folder:**
-   ```powershell
-   cd C:\livescore-listener\
-   ```
-
-4. **Run installer:**
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File install.ps1
-   ```
-
-5. **Follow the prompts** dan selesai!
-
----
-
 ## 🔨 Manual Installation
 
 Jika prefer instalasi manual:
@@ -287,11 +265,19 @@ Should return:
 ---
 
 ### 3. Test vMix Endpoint
+Individu:
 ```
 http://localhost:6969/vmix-flat?id=1
 ```
 
-Should return flat JSON data.
+Beregu (turnamen tim):
+```
+http://localhost:6969/vmix-flat-beregu?id=1
+```
+
+Should return flat JSON data (dalam bentuk array). Endpoint beregu
+mengembalikan `404 Court not found (beregu)` sampai ada event beregu pertama
+di court tersebut; cek `http://localhost:6969/debug-beregu?id=1`.
 
 ---
 
@@ -442,23 +428,24 @@ Recreate shortcuts manually:
 ```
 C:\livescore-listener\
 │
-├── livescore-listener-wib.js    # Main application
+├── livescore-listener-wib.js    # Main application (individu + beregu)
 ├── package.json                  # Dependencies
+├── env.example                   # Config template
 ├── .env                          # Configuration
-├── ecosystem.config.js           # PM2 config (optional)
+├── ecosystem.config.js           # PM2 config (optional, dibuat installer)
 │
 ├── install.bat                   # Batch installer
-├── install.ps1                   # PowerShell installer
 │
-├── start.bat                     # Start script
-├── stop.bat                      # Stop script
-├── status.bat                    # Status check
-├── test.bat                      # Test script
+├── start.bat                     # Start script (dibuat installer)
+├── stop.bat                      # Stop script (dibuat installer)
+├── status.bat                    # Status check (dibuat installer)
+├── test.bat                      # Test script (dibuat installer)
 │
-├── VMIX-SETUP.md                 # vMix integration guide
-├── FORMAT-COMPARISON.md          # API format guide
-├── WIB-TIMESTAMP-UPDATE.md       # Timestamp guide
-└── INSTALL-WINDOWS.md            # This file
+└── Dokumentasi\
+    ├── INSTALL-WINDOWS.md        # This file
+    ├── VMIX-SETUP.md             # vMix integration guide
+    ├── GIT-INSTALLATION.md       # Git installation guide
+    └── PACKAGE-SUMMARY.md        # Package summary
 ```
 
 ---
@@ -539,7 +526,7 @@ NODE_ENV=development
 
 - [ ] Node.js installed (v16+)
 - [ ] Files extracted to folder
-- [ ] Ran `install.bat` or `install.ps1`
+- [ ] Ran `install.bat`
 - [ ] Dependencies installed (npm install)
 - [ ] `.env` file configured
 - [ ] Application starts without errors
@@ -572,9 +559,9 @@ http://localhost:6969/vmix-flat?id=1
 
 ## 📚 Additional Documentation
 
-- **vMix Integration**: See `VMIX-SETUP.md`
-- **API Endpoints**: See `FORMAT-COMPARISON.md`
-- **Timestamp Format**: See `WIB-TIMESTAMP-UPDATE.md`
+- **vMix Integration** (individu & beregu): See [VMIX-SETUP.md](VMIX-SETUP.md)
+- **API Endpoints & Response Format**: See [README.md](../README.md)
+- **Git Installation**: See [GIT-INSTALLATION.md](GIT-INSTALLATION.md)
 
 ---
 

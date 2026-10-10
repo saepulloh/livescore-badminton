@@ -11,36 +11,35 @@ Anda sekarang memiliki **complete production-ready package** untuk Livescore Lis
 ### 🚀 Core Application
 | File | Description |
 |------|-------------|
-| `livescore-listener-wib.js` | Main application dengan WIB timestamp |
+| `livescore-listener-wib.js` | Main application (individu + beregu, WIB timestamp) |
+| `debug-socket.js` | Debug koneksi socket |
+| `test-connection.js` | Test koneksi (`npm test`) |
 | `package.json` | Dependencies & scripts configuration |
-| `.env.example` | Configuration template |
+| `env.example` | Configuration template |
 | `.gitignore` | Git ignore file |
 
-### 🪟 Windows Installers
+### 🪟 Windows Installer
 | File | Description |
 |------|-------------|
 | `install.bat` | **ONE-CLICK INSTALLER** (Batch) ⭐ |
-| `install.ps1` | PowerShell installer (alternative) |
-| `uninstall.bat` | Uninstaller |
 
 **Auto-creates:**
+- ✅ `.env` - Configuration file
 - ✅ `start.bat` - Start application
 - ✅ `stop.bat` - Stop application
 - ✅ `status.bat` - Check status
 - ✅ `test.bat` - Test endpoints
 - ✅ Desktop shortcuts
-- ✅ PM2 service (optional)
+- ✅ PM2 service + `ecosystem.config.js` (optional)
 
 ### 📚 Documentation
 | File | Description | Priority |
 |------|-------------|----------|
 | `README.md` | Main documentation | ⭐⭐⭐ |
-| `QUICK-START.md` | 5-minute quick start | ⭐⭐⭐ |
-| `INSTALL-WINDOWS.md` | Complete Windows guide | ⭐⭐ |
-| `VMIX-SETUP.md` | vMix integration guide | ⭐⭐⭐ |
-| `FORMAT-COMPARISON.md` | API formats comparison | ⭐⭐ |
-| `WIB-TIMESTAMP-UPDATE.md` | Timestamp format details | ⭐ |
-| `DEPLOYMENT-CHECKLIST.md` | Production deployment guide | ⭐ |
+| `Dokumentasi/INSTALL-WINDOWS.md` | Complete Windows guide | ⭐⭐ |
+| `Dokumentasi/VMIX-SETUP.md` | vMix integration guide (individu & beregu) | ⭐⭐⭐ |
+| `Dokumentasi/GIT-INSTALLATION.md` | Git installation guide | ⭐ |
+| `Dokumentasi/PACKAGE-SUMMARY.md` | This file | ⭐ |
 
 ---
 
@@ -77,11 +76,11 @@ Anda sekarang memiliki **complete production-ready package** untuk Livescore Lis
 npm install
 
 # 2. Configure
-cp .env.example .env
+cp env.example .env
 nano .env
 
 # 3. Run
-node livescore-listener-wib.js
+npm start
 
 # 4. Test
 curl http://localhost:6969/status
@@ -95,12 +94,13 @@ curl http://localhost:6969/status
 
 2. **In vMix:**
    - Add Input → Web Browser
-   - URL: `http://localhost:6969/vmix-flat?id=1`
+   - URL individu: `http://localhost:6969/vmix-flat?id=1`
+   - URL beregu: `http://localhost:6969/vmix-flat-beregu?id=1`
    - Tick "Reload every 1000ms"
 
 3. **Create GT Title:**
    - Add text fields
-   - Use data binding: `{{team1_name}}`, `{{team1_set1}}`, etc.
+   - Use data binding: `team1_displayName`, `team1_set1`, `team1_serve`, etc.
 
 4. **Link Data Source:**
    - Select GT Title
@@ -108,7 +108,7 @@ curl http://localhost:6969/status
 
 ✅ **Score updates every 1 second automatically!**
 
-**Full guide:** See `VMIX-SETUP.md`
+**Full guide:** See [VMIX-SETUP.md](VMIX-SETUP.md)
 
 ---
 
@@ -116,14 +116,24 @@ curl http://localhost:6969/status
 
 ### For vMix (Recommended)
 
-**Flat JSON (Best for vMix):**
+**Individu — Flat JSON (Best for vMix):**
 ```
 http://localhost:6969/vmix-flat?id=1
 ```
 
-**XML Format:**
+**Individu — XML Format:**
 ```
 http://localhost:6969/vmix-xml?id=1
+```
+
+**Beregu (turnamen tim) — Flat JSON:**
+```
+http://localhost:6969/vmix-flat-beregu?id=1
+```
+
+**Beregu (turnamen tim) — XML Format:**
+```
+http://localhost:6969/vmix-xml-beregu?id=1
 ```
 
 ### Other Endpoints
@@ -153,6 +163,12 @@ http://localhost:6969/lapangan?id=1
 http://localhost:6969/events?limit=20
 ```
 
+**Debug Data Internal:**
+```
+http://localhost:6969/debug?id=1          # individu
+http://localhost:6969/debug-beregu?id=1   # beregu
+```
+
 ---
 
 ## 🔧 Configuration Options
@@ -175,22 +191,19 @@ PORT=6969
 ## 📖 Which Documentation to Read?
 
 ### I just want to use it quickly
-→ Read `QUICK-START.md` (5 minutes)
+→ Read the Quick Start section in `README.md` (5 minutes)
 
 ### I need Windows installation help
 → Read `INSTALL-WINDOWS.md` (comprehensive guide)
 
 ### I need vMix integration
-→ Read `VMIX-SETUP.md` (step-by-step with examples)
+→ Read `VMIX-SETUP.md` (step-by-step with examples, individu & beregu)
 
 ### I want to understand the API
-→ Read `FORMAT-COMPARISON.md` (endpoint details)
+→ Read the API Endpoints & Response Format sections in `README.md`
 
-### I'm deploying to production
-→ Read `DEPLOYMENT-CHECKLIST.md` (full checklist)
-
-### I want everything
-→ Read `README.md` (complete documentation)
+### I need Git installation / clone help
+→ Read `GIT-INSTALLATION.md`
 
 ---
 
@@ -211,6 +224,8 @@ This package is perfect for:
 - ✅ **One-Click Installation** - Windows installer handles everything
 - ✅ **vMix Ready** - Optimized formats for vMix integration
 - ✅ **Real-Time Updates** - Score updates every second
+- ✅ **Individu & Beregu** - Endpoint terpisah untuk pertandingan individu dan turnamen tim
+- ✅ **Serve Indicator** - `team1_serve` / `team2_serve` update tiap poin
 - ✅ **Multi-Court Support** - Monitor up to 12 courts simultaneously
 - ✅ **WIB Timezone** - Readable timestamps in WIB format
 - ✅ **No Database** - Lightweight, runs in memory
@@ -277,6 +292,7 @@ DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
 # Allow access from other PCs
 # Configure Windows Firewall to allow port 6969
 # vMix PC can access: http://192.168.1.100:6969/vmix-flat?id=1
+# (beregu: http://192.168.1.100:6969/vmix-flat-beregu?id=1)
 ```
 
 ### Tip 4: Test Before Live
@@ -284,6 +300,7 @@ DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
 # Always test before live event
 curl http://localhost:6969/status
 curl http://localhost:6969/vmix-flat?id=1
+curl http://localhost:6969/vmix-flat-beregu?id=1   # jika turnamen beregu
 ```
 
 ---
@@ -332,53 +349,48 @@ start.bat
 
 ### Files You Have
 - [x] `livescore-listener-wib.js` - Main application
+- [x] `debug-socket.js` / `test-connection.js` - Debug & test koneksi
 - [x] `package.json` - Dependencies
-- [x] `.env.example` - Config template
+- [x] `env.example` - Config template
 - [x] `.gitignore` - Git ignore
 
-### Installers
+### Installer
 - [x] `install.bat` - Windows installer (Batch)
-- [x] `install.ps1` - Windows installer (PowerShell)
-- [x] `uninstall.bat` - Uninstaller
 
 ### Documentation
 - [x] `README.md` - Main docs
-- [x] `QUICK-START.md` - Quick guide
-- [x] `INSTALL-WINDOWS.md` - Windows guide
-- [x] `VMIX-SETUP.md` - vMix guide
-- [x] `FORMAT-COMPARISON.md` - API reference
-- [x] `WIB-TIMESTAMP-UPDATE.md` - Timestamp info
-- [x] `DEPLOYMENT-CHECKLIST.md` - Production guide
+- [x] `Dokumentasi/INSTALL-WINDOWS.md` - Windows guide
+- [x] `Dokumentasi/VMIX-SETUP.md` - vMix guide
+- [x] `Dokumentasi/GIT-INSTALLATION.md` - Git guide
+- [x] `Dokumentasi/PACKAGE-SUMMARY.md` - Package summary
 
 ---
 
 ## 🎓 Learning Path
 
 ### Beginner (Just Want to Use)
-1. Read `QUICK-START.md` (5 min)
+1. Read `README.md` → Quick Start (5 min)
 2. Run `install.bat` (5 min)
-3. Read `VMIX-SETUP.md` → Quick Setup section (5 min)
+3. Read `VMIX-SETUP.md` → Setup vMix section (5 min)
 4. **Total: 15 minutes**
 
 ### Intermediate (Want to Customize)
 1. Read `README.md` (15 min)
 2. Read `INSTALL-WINDOWS.md` (20 min)
 3. Read `VMIX-SETUP.md` (15 min)
-4. Read `FORMAT-COMPARISON.md` (10 min)
-5. **Total: 60 minutes**
+4. **Total: 50 minutes**
 
 ### Advanced (Production Deployment)
 1. Read all documentation (60 min)
-2. Read `DEPLOYMENT-CHECKLIST.md` (30 min)
-3. Test all scenarios (60 min)
-4. **Total: 150 minutes**
+2. Test all scenarios, individu dan beregu (60 min)
+3. **Total: 120 minutes**
 
 ---
 
 ## 🚀 Next Steps
 
 ### To Get Started Now:
-1. **Read:** `QUICK-START.md`
+1. **Read:** `README.md` → Quick Start
 2. **Run:** `install.bat`
 3. **Start:** `start.bat`
 4. **Test:** Open `http://localhost:6969`
@@ -390,11 +402,10 @@ start.bat
 4. **Test** with live match
 
 ### For Production Deployment:
-1. **Read:** `DEPLOYMENT-CHECKLIST.md`
-2. **Test** all scenarios
-3. **Configure** Windows Firewall
-4. **Setup** PM2 service mode
-5. **Monitor** performance
+1. **Test** all scenarios (individu & beregu)
+2. **Configure** Windows Firewall
+3. **Setup** PM2 service mode
+4. **Monitor** performance
 
 ---
 
@@ -408,8 +419,7 @@ start.bat
 ### Common Questions
 - "How to install?" → `INSTALL-WINDOWS.md`
 - "How to use with vMix?" → `VMIX-SETUP.md`
-- "What endpoints available?" → `FORMAT-COMPARISON.md`
-- "How to deploy?" → `DEPLOYMENT-CHECKLIST.md`
+- "What endpoints available?" → `README.md` → API Endpoints
 
 ---
 
@@ -423,7 +433,7 @@ You now have **everything needed** to:
 - ✅ Troubleshoot issues
 - ✅ Customize configuration
 
-**Start with `QUICK-START.md` and you'll be streaming in 5 minutes!**
+**Start with the Quick Start in `README.md` and you'll be streaming in 5 minutes!**
 
 ---
 

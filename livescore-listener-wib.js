@@ -9,7 +9,7 @@
  * - HTTP endpoint /listpertandingan untuk melihat data
  * 
  * Usage:
- *   node livescore-listener.js
+ *   node livescore-listener-wib.js
  */
 
 require('dotenv').config();

@@ -100,7 +100,7 @@ found 0 vulnerabilities
 
 ```bash
 # Copy example config
-cp .env.example .env
+cp env.example .env
 
 # Edit configuration
 nano .env
@@ -791,7 +791,7 @@ open https://github.com/saepulloh/livescore-badminton/issues/new
 git clone https://github.com/saepulloh/livescore-badminton.git
 cd livescore-badminton
 npm install
-cp .env.example .env
+cp env.example .env
 nano .env
 npm start
 ```

@@ -5,7 +5,7 @@
   "main": "livescore-listener-wib.js",
   "scripts": {
     "start": "node livescore-listener-wib.js",
-    "dev": "node livescore-listener.js",
+    "dev": "node livescore-listener-wib.js",
     "test": "node test-connection.js"
   },
   "keywords": [
