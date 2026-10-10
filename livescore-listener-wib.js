@@ -466,8 +466,7 @@ function handleBereguUpdateScore(data, klasemenUid) {
 // pakai ?./??/|| defensif — court tanpa tie beregu (atau belum sempat
 // di-fetch) tetap harus balas 200 dengan default aman, TIDAK PERNAH throw
 // (pelajaran dari crash produksi /vmix-flat sebelumnya).
-function buildBereguFlat(lap) {
-    const courtData = bereguData[lap] || {};
+function buildBereguFlat(lap, courtData = bereguData[lap] || {}) {
     const ctx = courtData.context || {};
     const live = courtData.liveScore || {};
     const klasemenMatch = ctx.klasemenMatch || {};
@@ -680,6 +679,8 @@ ${C.cyan}═══════════════════════�
    • ${C.bright}/vmix-flat-beregu?id=N${C.reset}  → Flat JSON (recommended) ⭐
    • ${C.bright}/vmix-xml-beregu?id=N${C.reset}   → XML format
 
+   ${C.yellow}Test mode:${C.reset} add ${C.bright}&test=true${C.reset} to any vMix endpoint above → dummy data
+
    ${C.cyan}Other Endpoints:${C.reset}
    • /listpertandingan  → All match data
    • /lapangan?id=N     → Specific court (full data)
@@ -692,6 +693,68 @@ ${C.yellow}⏳ Waiting for broadcast... (Ctrl+C to stop)${C.reset}
 ────────────────────────────────────────────────────────────────
 `);
 }
+
+// ============================================
+// TEST MODE — dummy data for vMix setup (?test=true)
+// ============================================
+function isTestMode(query) {
+    return query.test === 'true' || query.test === '1';
+}
+
+// Same shape as matchData[court]; a doubles match so player2 fields are filled
+const DUMMY_COURT_DATA = {
+    status: 'playing',
+    lastUpdate: null,
+    matchInfo: {
+        kelompok_pertandingan: { nama: "TEST - Men's Doubles" },
+        round: 'SF',
+        nr: 12,
+        team1: {
+            lastname1: 'Muhammad Rizky Pratama', displayName1: 'Rizky', player1_club: 'PB Djarum Kudus',
+            lastname2: 'Fauzan Akbar Maulana', displayName2: 'Fauzan', player2_club: 'PB Djarum Kudus'
+        },
+        team2: {
+            lastname1: 'Akmal Zaidan Pamuji', displayName1: 'Akmal', player1_club: 'PB Jaya Raya Jakarta',
+            lastname2: 'Bagas Satria Nugraha', displayName2: 'Bagas', player2_club: 'PB Jaya Raya Jakarta'
+        }
+    },
+    playData: { livematch: [{ serv_team: 1 }] },
+    currentScore: {
+        team1set1: 21, team2set1: 19,
+        team1set2: 11, team2set2: 8,
+        team1set3: 0, team2set3: 0,
+        team1point: 11, team2point: 8,
+        pemenang: 0, retired: 0, durasi: 32
+    }
+};
+
+// Same shape as bereguData[court]
+const DUMMY_BEREGU_DATA = {
+    status: 'playing',
+    lastUpdate: null,
+    context: {
+        club1_name: 'PB Djarum Kudus',
+        club2_name: 'PB Jaya Raya Jakarta',
+        klasemenMatch: { club1: 'club-1', club2: 'club-2' },
+        livematch: { current_set: 2, current_partai: 2, serv_team: 1 },
+        pertandingan: {},
+        partai: [{ set_no: 2, partai_no: 2, partai_type: 'MD' }],
+        partaiCategories: [{ alias: 'MD', nama: "Men's Doubles" }],
+        lineup: [
+            { club: 'club-1', set_no: 2, partai_type: 'MD', slot: 1, pemain_nama: 'Muhammad Rizky Pratama', pemain_lastname: 'Rizky' },
+            { club: 'club-1', set_no: 2, partai_type: 'MD', slot: 2, pemain_nama: 'Fauzan Akbar Maulana', pemain_lastname: 'Fauzan' },
+            { club: 'club-2', set_no: 2, partai_type: 'MD', slot: 1, pemain_nama: 'Akmal Zaidan Pamuji', pemain_lastname: 'Akmal' },
+            { club: 'club-2', set_no: 2, partai_type: 'MD', slot: 2, pemain_nama: 'Bagas Satria Nugraha', pemain_lastname: 'Bagas' }
+        ]
+    },
+    liveScore: {
+        team1set1: 21, team2set1: 19,
+        team1set2: 11, team2set2: 8,
+        team1set3: 0, team2set3: 0,
+        team1point: 11, team2point: 8,
+        pemenang: 0, durasi: 32, serv_team: 1
+    }
+};
 
 // ============================================
 // HTTP SERVER
@@ -713,6 +776,7 @@ function startHttpServer() {
             return;
         }
         const lap = parsedUrl.query.id;
+        const testMode = isTestMode(parsedUrl.query);
         switch (pathname) {
             case '/listpertandingan':
             case '/pertandingan':
@@ -859,10 +923,10 @@ function startHttpServer() {
                 
             case '/vmix-flat':
                 // vMix-friendly flat structure endpoint
-                if (lap && matchData[lap]) {
+                if (testMode || (lap && matchData[lap])) {
                     res.writeHead(200);
-                    
-                    const courtData = matchData[lap];
+
+                    const courtData = testMode ? DUMMY_COURT_DATA : matchData[lap];
                     const playData = courtData.playData || {};
                     const matchInfo = courtData.matchInfo || playData;
                     const currentScore = courtData.currentScore || {};
@@ -880,7 +944,7 @@ function startHttpServer() {
                     
                     const vmixData = {
                         // Court info
-                        court: lap,
+                        court: lap || '1',
                         status: courtData.status || 'unknown',
                         
                         // Tournament info
@@ -945,11 +1009,11 @@ function startHttpServer() {
                 
             case '/vmix-xml':
                 // vMix XML format endpoint
-                if (lap && matchData[lap]) {
+                if (testMode || (lap && matchData[lap])) {
                     res.setHeader('Content-Type', 'text/xml');
                     res.writeHead(200);
-                    
-                    const courtData = matchData[lap];
+
+                    const courtData = testMode ? DUMMY_COURT_DATA : matchData[lap];
                     const playData = courtData.playData || {};
                     const matchInfo = courtData.matchInfo || playData;
                     const currentScore = courtData.currentScore || {};
@@ -960,7 +1024,7 @@ function startHttpServer() {
                     // Build XML structure - prioritas dari currentScore
                     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <match>
-  <court>${lap}</court>
+  <court>${lap || '1'}</court>
   <status>${courtData.status || 'unknown'}</status>
   <tournament>${matchInfo.kelompok_pertandingan?.nama || ''}</tournament>
   <round>${matchInfo.round || ''}</round>
@@ -1026,9 +1090,9 @@ function startHttpServer() {
             // sekali. Operator broadcast ganti URL sesuai jenis turnamen.
             // ============================================
             case '/vmix-flat-beregu':
-                if (lap && bereguData[lap]) {
+                if (testMode || (lap && bereguData[lap])) {
                     res.writeHead(200);
-                    res.end(JSON.stringify([buildBereguFlat(lap)], null, 2));
+                    res.end(JSON.stringify([buildBereguFlat(lap || '1', testMode ? DUMMY_BEREGU_DATA : undefined)], null, 2));
                 } else {
                     res.writeHead(404);
                     res.end(JSON.stringify({
@@ -1040,9 +1104,9 @@ function startHttpServer() {
 
             case '/vmix-xml-beregu': {
                 res.setHeader('Content-Type', 'text/xml');
-                if (lap && bereguData[lap]) {
+                if (testMode || (lap && bereguData[lap])) {
                     res.writeHead(200);
-                    const v = buildBereguFlat(lap);
+                    const v = buildBereguFlat(lap || '1', testMode ? DUMMY_BEREGU_DATA : undefined);
                     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <match>
   <court>${v.court}</court>
@@ -1175,6 +1239,7 @@ function startHttpServer() {
                     vmix_integration: {
                         json: 'Use /vmix-flat?id=N (individual) or /vmix-flat-beregu?id=N (beregu) for GT Title Designer/Web input',
                         xml: 'Use /vmix-xml?id=N (individual) or /vmix-xml-beregu?id=N (beregu) for Data Source (XML)',
+                        test_mode: 'Add &test=true to any vMix endpoint to get dummy data (works even when the court has no data)',
                         polling_interval: '1000ms recommended (1 second)'
                     },
                     livescoreHost: LIVESCORE_HOST,

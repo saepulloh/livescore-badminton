@@ -10,7 +10,6 @@ Real-time badminton livescore socket listener with vMix integration for broadcas
 
 ## ✨ Features
 
-- 🔌 **Socket Connection** - Real-time connection to the livescore server via Sails.io.js
 - 🎯 **Multi-Court Support** - Monitor multiple courts simultaneously
 - 🌐 **HTTP API** - RESTful endpoints for data access
 - 🎬 **vMix Ready** - Flat JSON and XML formats for vMix integration
@@ -229,6 +228,25 @@ returns `200` with default values.
 XML for team tournaments; the structure is the same as `/vmix-xml` plus
 `<partai_type>`, `<partai_label>`, `<current_set>`, `<sets_won_team1>` and
 `<sets_won_team2>`.
+
+---
+
+### Test Mode (`&test=true`)
+
+Add `&test=true` to any vMix endpoint to get **dummy data** (a doubles match
+with names, clubs, scores and serve), even when no match has been received yet.
+This lets the vMix operator build and test a GT Title offline.
+
+```bash
+curl "http://localhost:6969/vmix-flat?id=1&test=true"
+curl "http://localhost:6969/vmix-xml?id=1&test=true"
+curl "http://localhost:6969/vmix-flat-beregu?id=1&test=true"
+curl "http://localhost:6969/vmix-xml-beregu?id=1&test=true"
+```
+
+- Same fields as real data, so bindings made in test mode keep working live.
+- Works for any `id`, even a court that has no data (no 404).
+- Remove `&test=true` from the vMix URL before going live.
 
 ---
 

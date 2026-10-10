@@ -65,7 +65,23 @@ http://localhost:6969/vmix-xml-beregu?id=1
 
 ---
 
-### 3. Debug endpoints
+### 3. Test mode: `&test=true`
+Add `&test=true` to any of the four endpoints above to get **dummy data** (a
+doubles match with player names, clubs, scores and serve), even when no match
+has been received yet. Use it to build and test the GT Title before the event.
+
+```
+http://localhost:6969/vmix-flat?id=1&test=true
+http://localhost:6969/vmix-flat-beregu?id=1&test=true
+```
+
+- Same field names as real data, so everything you bind now keeps working live.
+- Works for any `id`, including courts that have no data (no 404).
+- **Remove `&test=true` from the vMix URL before going live.**
+
+---
+
+### 4. Debug endpoints
 | Endpoint | Purpose |
 |----------|---------|
 | `/debug?id=N` | Internal data structure of an individual court |
@@ -537,6 +553,8 @@ if (team1_set1 > team2_set1) {
 - [ ] Web Input has been added with the correct URL
 - [ ] Auto-reload at 1000ms is enabled
 - [ ] Data Source has been linked to the GT Title
+- [ ] Build and check the layout with `&test=true` (dummy data)
+- [ ] Remove `&test=true` from the vMix URL before going live
 - [ ] Test with a real match → score and serve update
 
 ---
