@@ -488,7 +488,7 @@ in the team event (beregu) referee app (wasit) first, then check:
 curl http://localhost:6969/debug-beregu?id=1
 ```
 
-If `context` is empty, check the log `Beregu context fetch gagal` — it means
+If `context` is empty, check the log `Beregu context fetch failed` — it means
 `/ligatie/joinRoomWasit` cannot be reached from the listener.
 
 **Full guide:** See [Dokumentasi/INSTALL-WINDOWS.md](Dokumentasi/INSTALL-WINDOWS.md) → Troubleshooting section

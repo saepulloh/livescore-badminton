@@ -472,7 +472,7 @@ team event referee app (wasit beregu) first, then check:
 ```bash
 curl http://localhost:6969/debug-beregu?id=1
 ```
-If `context` is empty, look at the listener log (`Beregu context fetch gagal`).
+If `context` is empty, look at the listener log (`Beregu context fetch failed`).
 
 ### ❌ Team event player/club names are empty
 Names are taken from the *context*, which is refreshed on `liga*` events (changing match/set), not on every point. Make sure the referee has pressed PLAY / set the match, or check `lastContextFetch` in `/debug-beregu?id=N`.

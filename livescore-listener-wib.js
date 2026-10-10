@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * Livescore Socket Listener
- * Menggunakan sails.io.js untuk kompatibilitas dengan Sails
+ * Uses sails.io.js for compatibility with Sails
  * 
  * Features:
- * - Listen socket events dari LIVESCORE_HOST
- * - Simpan data pertandingan di memori
- * - HTTP endpoint /listpertandingan untuk melihat data
+ * - Listen to socket events from LIVESCORE_HOST
+ * - Store match data in memory
+ * - HTTP endpoint /listpertandingan to view data
  * 
  * Usage:
  *   node livescore-listener-wib.js
@@ -68,17 +68,17 @@ function logSection(title) {
 // GET LAPANGAN LIST FROM ENV
 // ============================================
 function getLapanganList() {
-    logSection('Loading Daftar Lapangan from ENV');
+    logSection('Loading court list from ENV');
     
     const lapanganList = DAFTAR_LAPANGAN.map(nama => ({
         nama: nama,
         uid: nama  // Use nama as uid since we don't have database
     }));
     
-    log(C.green, `✅ Found ${lapanganList.length} lapangan`);
-    console.log('\n📋 Daftar Lapangan:');
+    log(C.green, `✅ Found ${lapanganList.length} courts`);
+    console.log('\n📋 Court List:');
     lapanganList.forEach((lap, idx) => {
-        console.log(`   ${idx + 1}. Lapangan ${lap.nama}`);
+        console.log(`   ${idx + 1}. Court ${lap.nama}`);
     });
     
     return lapanganList;
@@ -177,7 +177,7 @@ function handleClearLapangan(data) {
         matchData[lapangan].lastUpdate = getWIBTimestamp();
         matchData[lapangan].finishData = data;
         
-        console.log(`   ✅ ${C.yellow}Match finished di court ${lapangan}${C.reset}`);
+        console.log(`   ✅ ${C.yellow}Match finished on court ${lapangan}${C.reset}`);
         
         // Optional: Clear currentScore agar ready untuk match berikutnya
         // Uncomment jika ingin auto-clear setelah match selesai
@@ -282,7 +282,7 @@ function handlePlayGame(data) {
         durasi: data.durasi ?? 0
     };
     
-    console.log(`   🔄 ${C.green}Score RESET untuk match baru di court ${lapangan}${C.reset}`);
+    console.log(`   🔄 ${C.green}Score RESET for new match on court ${lapangan}${C.reset}`);
 }
 
 
@@ -335,7 +335,7 @@ function handleLigaContextEvent(data) {
 
     const lapangan = resolveLapanganFromLigaEvent(data);
     if (!lapangan) {
-        console.log(`   ${C.yellow}⚠️  Tidak bisa resolve lapangan dari liga event, di-skip${C.reset}`);
+        console.log(`   ${C.yellow}⚠️  Could not resolve court from liga event, skipping${C.reset}`);
         return;
     }
 
@@ -366,7 +366,7 @@ function fetchBereguContext(lapangan) {
 
     io.socket.get('/ligatie/joinRoomWasit', { lapangan: lapangan }, (body, response) => {
         if (!response || response.statusCode !== 200 || !body) {
-            console.log(`   ${C.yellow}⚠️  Beregu context fetch gagal court ${lapangan}: ${response ? response.statusCode : 'no response'}${C.reset}`);
+            console.log(`   ${C.yellow}⚠️  Beregu context fetch failed for court ${lapangan}: ${response ? response.statusCode : 'no response'}${C.reset}`);
             return; // biarkan context lama apa adanya, jangan throw
         }
 
@@ -658,21 +658,21 @@ ${C.cyan}═══════════════════════�
 👂 LISTENING FOR BROADCASTS...
 ════════════════════════════════════════════════════════════════${C.reset}
 
-📡 Events (individu):
+📡 Events (individual):
    • ${C.green}clearLapangan${C.reset}  → Match finished
    • ${C.blue}updatescore${C.reset}    → Real-time score updates ⭐
-   • ${C.blue}play${C.reset}           → Dari joinRoomWasit
+   • ${C.blue}play${C.reset}           → From joinRoomWasit
    • ${C.blue}playgame${C.reset}       → Match on court
 
-📡 Events (beregu/turnamen tim):
-   • ${C.magenta}ligaPlay / ligaSetpartai / ligaClearCourt${C.reset} → Sinyal refresh context
-   • ${C.magenta}ligaLineupUpdated / ligaScoreUpdate${C.reset}       → Sinyal refresh context
-   • ${C.blue}addPoint${C.reset} (klasemen_uid truthy)              → Skor real-time, tanpa fetch
+📡 Events (beregu/team event):
+   • ${C.magenta}ligaPlay / ligaSetpartai / ligaClearCourt${C.reset} → Context refresh signal
+   • ${C.magenta}ligaLineupUpdated / ligaScoreUpdate${C.reset}       → Context refresh signal
+   • ${C.blue}addPoint${C.reset} (klasemen_uid truthy)              → Real-time score, no fetch
 
 🏟️  Rooms: ${joinedRooms.join(', ')}
 
 🌐 HTTP Server: http://localhost:${PORT}
-   ${C.magenta}vMix Endpoints (individu):${C.reset}
+   ${C.magenta}vMix Endpoints (individual):${C.reset}
    • ${C.bright}/vmix-flat?id=N${C.reset}  → Flat JSON (recommended) ⭐
    • ${C.bright}/vmix-xml?id=N${C.reset}   → XML format
 
@@ -683,12 +683,12 @@ ${C.cyan}═══════════════════════�
    ${C.cyan}Other Endpoints:${C.reset}
    • /listpertandingan  → All match data
    • /lapangan?id=N     → Specific court (full data)
-   • /debug?id=N        → Debug internal data structure (individu)
+   • /debug?id=N        → Debug internal data structure (individual)
    • /debug-beregu?id=N → Debug internal data structure (beregu)
    • /status            → Connection status
    • /events            → Event history
 
-${C.yellow}⏳ Menunggu broadcast... (Ctrl+C untuk stop)${C.reset}
+${C.yellow}⏳ Waiting for broadcast... (Ctrl+C to stop)${C.reset}
 ────────────────────────────────────────────────────────────────
 `);
 }
@@ -771,7 +771,7 @@ function startHttpServer() {
                     res.writeHead(404);
                     res.end(JSON.stringify({
                         success: false,
-                        error: 'Lapangan not found',
+                        error: 'Court not found',
                         available: Object.keys(matchData)
                     }, null, 2));
                 }
@@ -809,7 +809,7 @@ function startHttpServer() {
                     res.writeHead(404);
                     res.end(JSON.stringify({
                         success: false,
-                        error: 'Lapangan not found',
+                        error: 'Court not found',
                         available: Object.keys(matchData)
                     }, null, 2));
                 }
@@ -851,7 +851,7 @@ function startHttpServer() {
                     res.writeHead(404);
                     res.end(JSON.stringify({
                         success: false,
-                        error: 'Lapangan not found',
+                        error: 'Court not found',
                         available: Object.keys(matchData)
                     }, null, 2));
                 }
@@ -1129,7 +1129,7 @@ function startHttpServer() {
                     res.writeHead(404);
                     res.end(JSON.stringify({
                         success: false,
-                        error: 'Lapangan not found (beregu)',
+                        error: 'Court not found (beregu)',
                         available: Object.keys(bereguData)
                     }, null, 2));
                 }
@@ -1165,16 +1165,16 @@ function startHttpServer() {
                         '/lapangan?id=N': 'Get data for specific court',
                         '/debug?id=N': 'Debug internal data structure for specific court',
                         '/vmix?id=N': 'Get match data (nested structure)',
-                        '/vmix-flat?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED FOR VMIX (individu)',
-                        '/vmix-xml?id=N': 'Get vMix-friendly XML data (individu)',
-                        '/vmix-flat-beregu?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED (beregu/turnamen tim)',
-                        '/vmix-xml-beregu?id=N': 'Get vMix-friendly XML data (beregu/turnamen tim)',
+                        '/vmix-flat?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED FOR VMIX (individual)',
+                        '/vmix-xml?id=N': 'Get vMix-friendly XML data (individual)',
+                        '/vmix-flat-beregu?id=N': 'Get vMix-friendly flat JSON data ⭐ RECOMMENDED (beregu/team event)',
+                        '/vmix-xml-beregu?id=N': 'Get vMix-friendly XML data (beregu/team event)',
                         '/debug-beregu?id=N': 'Debug internal data structure for specific court (beregu)',
                         '/clear': 'Clear all stored data'
                     },
                     vmix_integration: {
-                        json: 'Use /vmix-flat?id=N (individu) atau /vmix-flat-beregu?id=N (beregu) untuk GT Title Designer/Web input',
-                        xml: 'Use /vmix-xml?id=N (individu) atau /vmix-xml-beregu?id=N (beregu) untuk Data Source (XML)',
+                        json: 'Use /vmix-flat?id=N (individual) or /vmix-flat-beregu?id=N (beregu) for GT Title Designer/Web input',
+                        xml: 'Use /vmix-xml?id=N (individual) or /vmix-xml-beregu?id=N (beregu) for Data Source (XML)',
                         polling_interval: '1000ms recommended (1 second)'
                     },
                     livescoreHost: LIVESCORE_HOST,
@@ -1194,8 +1194,8 @@ function startHttpServer() {
                         '/events',
                         '/lapangan?id=N',
                         '/debug?id=N (debugging)',
-                        '/vmix-flat?id=N (vMix recommended, individu)',
-                        '/vmix-xml?id=N (individu)',
+                        '/vmix-flat?id=N (vMix recommended, individual)',
+                        '/vmix-xml?id=N (individual)',
                         '/vmix-flat-beregu?id=N (vMix recommended, beregu)',
                         '/vmix-xml-beregu?id=N (beregu)',
                         '/debug-beregu?id=N (debugging, beregu)',
@@ -1259,7 +1259,7 @@ async function main() {
     console.log('📋 Configuration:');
     console.log(`   Livescore Host : ${LIVESCORE_HOST}`);
     console.log(`   HTTP Port      : ${PORT}`);
-    console.log(`   Daftar Lapangan: ${DAFTAR_LAPANGAN.join(', ')}`);
+    console.log(`   Courts          : ${DAFTAR_LAPANGAN.join(', ')}`);
     
     // Start HTTP server first
     const httpServer = startHttpServer();
