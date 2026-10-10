@@ -1,25 +1,25 @@
 # 🏸 Livescore Listener
 
-Real-time badminton livescore socket listener dengan dukungan vMix integration untuk broadcast/streaming.
+Real-time badminton livescore socket listener with vMix integration for broadcast/streaming.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ---
 
 ## ✨ Features
 
-- 🔌 **Socket Connection** - Koneksi real-time ke livescore server via Sails.io.js
+- 🔌 **Socket Connection** - Real-time connection to the livescore server via Sails.io.js
 - 🎯 **Multi-Court Support** - Monitor multiple courts simultaneously
-- 🌐 **HTTP API** - RESTful endpoints untuk akses data
-- 🎬 **vMix Ready** - Format flat JSON dan XML untuk vMix integration
-- 👥 **Individu & Beregu** - Endpoint terpisah untuk pertandingan individu dan turnamen tim (beregu, 3x55)
-- 🏸 **Indikator Serve** - Field `team1_serve` / `team2_serve` ter-update setiap poin
-- 🕐 **WIB Timezone** - Timestamp dalam format WIB (GMT+7) yang readable
-- 💾 **In-Memory Storage** - Tidak butuh database, data tersimpan di RAM
-- ⚡ **Real-time Updates** - Score update otomatis setiap ada perubahan
-- 🪟 **Windows Support** - One-click installer untuk Windows
+- 🌐 **HTTP API** - RESTful endpoints for data access
+- 🎬 **vMix Ready** - Flat JSON and XML formats for vMix integration
+- 👥 **Singles/Doubles (individu) & Team Event (beregu)** - Separate endpoints for singles/doubles matches and team tournaments (team event / beregu, 3x55)
+- 🏸 **Serve Indicator** - The `team1_serve` / `team2_serve` fields are updated on every point
+- 🕐 **WIB Timezone** - Timestamps in a readable WIB (GMT+7) format
+- 💾 **In-Memory Storage** - No database needed, data is kept in RAM
+- ⚡ **Real-time Updates** - Scores update automatically on every change
+- 🪟 **Windows Support** - One-click installer for Windows
 
 ---
 
@@ -27,23 +27,23 @@ Real-time badminton livescore socket listener dengan dukungan vMix integration u
 
 ### Windows (One-Click Install)
 
-1. **Extract files** ke folder (e.g., `C:\livescore-listener\`)
+1. **Extract files** to a folder (e.g., `C:\livescore-listener\`)
 
 2. **Run installer:**
    ```cmd
    install.bat
    ```
-   Atau klik kanan → Run as Administrator
+   Or right-click → Run as Administrator
 
 3. **Edit configuration** (optional):
-   - Edit file `.env`
+   - Edit the `.env` file
    - Set `LIVESCORE_HOST`, `DAFTAR_LAPANGAN`, `PORT`
 
 4. **Start application:**
    ```cmd
    start.bat
    ```
-   Atau double-click shortcut di desktop
+   Or double-click the desktop shortcut
 
 5. **Open browser:**
    ```
@@ -70,7 +70,7 @@ Real-time badminton livescore socket listener dengan dukungan vMix integration u
 3. **Run:**
    ```bash
    npm start
-   # atau
+   # or
    node livescore-listener-wib.js
    ```
 
@@ -80,7 +80,7 @@ Real-time badminton livescore socket listener dengan dukungan vMix integration u
 
 ## 📋 Requirements
 
-- **Node.js** v16.0.0 or higher
+- **Node.js** v20.0.0 or higher
 - **npm** 7.0.0 or higher
 - Access to livescore server (Sails.js based)
 
@@ -88,13 +88,13 @@ Real-time badminton livescore socket listener dengan dukungan vMix integration u
 
 ## ⚙️ Configuration
 
-Edit file `.env`:
+Edit the `.env` file:
 
 ```env
 # Livescore host URL
 LIVESCORE_HOST=http://localhost:1337
 
-# Daftar lapangan (comma separated)
+# List of courts (comma separated)
 DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8,9,10,11,12
 
 # HTTP Server Port
@@ -105,8 +105,8 @@ PORT=6969
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LIVESCORE_HOST` | `http://localhost:1337` | URL livescore server |
-| `DAFTAR_LAPANGAN` | `1,2,3,4,5,6,7,8,9,10,11,12` | Nomor lapangan yang dimonitor |
+| `LIVESCORE_HOST` | `http://localhost:1337` | Livescore server URL |
+| `DAFTAR_LAPANGAN` | `1,2,3,4,5,6,7,8,9,10,11,12` | List of court numbers to monitor |
 | `PORT` | `6969` | HTTP server port |
 
 ---
@@ -115,17 +115,17 @@ PORT=6969
 
 ### For vMix (Recommended)
 
-Operator memilih URL sesuai jenis turnamen:
+The operator picks the URL according to the tournament type:
 
-| Jenis | JSON (recommended) ⭐ | XML |
+| Type | JSON (recommended) ⭐ | XML |
 |-------|----------------------|-----|
-| **Individu** | `/vmix-flat?id=N` | `/vmix-xml?id=N` |
-| **Beregu** (turnamen tim) | `/vmix-flat-beregu?id=N` | `/vmix-xml-beregu?id=N` |
+| **Singles/Doubles (individu)** | `/vmix-flat?id=N` | `/vmix-xml?id=N` |
+| **Team event (beregu)** (team tournament) | `/vmix-flat-beregu?id=N` | `/vmix-xml-beregu?id=N` |
 
-Response JSON dibungkus dalam array (`[ {...} ]`).
+JSON responses are wrapped in an array (`[ {...} ]`).
 
-#### `/vmix-flat?id=N` ⭐ (Individu)
-Flat JSON format untuk vMix GT Title Designer
+#### `/vmix-flat?id=N` ⭐ (Singles/Doubles, individu)
+Flat JSON format for the vMix GT Title Designer
 ```bash
 curl http://localhost:6969/vmix-flat?id=1
 ```
@@ -169,13 +169,13 @@ curl http://localhost:6969/vmix-flat?id=1
 ]
 ```
 
-> Untuk ganda, `player2_*` terisi dan `teamN_displayName` digabung dengan ` / `
-> (contoh: `"Rizky / Fauzan"`).
+> For doubles, `player2_*` is filled in and `teamN_displayName` is joined with ` / `
+> (example: `"Rizky / Fauzan"`).
 
 ---
 
-#### `/vmix-xml?id=N` (Individu)
-XML format untuk vMix Data Source
+#### `/vmix-xml?id=N` (Singles/Doubles, individu)
+XML format for the vMix Data Source
 ```bash
 curl http://localhost:6969/vmix-xml?id=1
 ```
@@ -214,20 +214,20 @@ curl http://localhost:6969/vmix-xml?id=1
 
 ---
 
-#### `/vmix-flat-beregu?id=N` ⭐ (Beregu)
-Flat JSON untuk turnamen tim (beregu). Field sama dengan individu, ditambah
-field khusus beregu (lihat tabel di bawah).
+#### `/vmix-flat-beregu?id=N` ⭐ (Team event, beregu)
+Flat JSON for team tournaments (team event / beregu). The fields are the same as
+for singles/doubles (individu), plus the team-event-specific fields (see the table below).
 ```bash
 curl http://localhost:6969/vmix-flat-beregu?id=1
 ```
 
-Court yang belum pernah menerima event beregu mengembalikan `404`
-(`Court not found (beregu)`). Court beregu yang sedang idle tetap
-mengembalikan `200` dengan nilai default.
+A court that has never received a team event (beregu) event returns `404`
+(`Court not found (beregu)`). An idle team event court still
+returns `200` with default values.
 
-#### `/vmix-xml-beregu?id=N` (Beregu)
-XML untuk turnamen tim; struktur sama dengan `/vmix-xml` ditambah
-`<partai_type>`, `<partai_label>`, `<current_set>`, `<sets_won_team1>` dan
+#### `/vmix-xml-beregu?id=N` (Team event, beregu)
+XML for team tournaments; the structure is the same as `/vmix-xml` plus
+`<partai_type>`, `<partai_label>`, `<current_set>`, `<sets_won_team1>` and
 `<sets_won_team2>`.
 
 ---
@@ -238,13 +238,13 @@ XML untuk turnamen tim; struktur sama dengan `/vmix-xml` ditambah
 |----------|--------|-------------|
 | `/` | GET | API documentation |
 | `/status` | GET | Connection status |
-| `/listpertandingan` | GET | All matches dari semua lapangan (individu) |
-| `/lapangan?id=N` | GET | Data lapangan tertentu (full, individu) |
-| `/vmix?id=N` | GET | Data match nested (individu) |
-| `/events?limit=N` | GET | Event history (default 100 terakhir) |
-| `/debug?id=N` | GET | Debug struktur data internal (individu) |
-| `/debug-beregu?id=N` | GET | Debug struktur data internal (beregu) |
-| `/clear` | GET | Clear all stored data (individu & beregu) |
+| `/listpertandingan` | GET | All matches from all courts (individual, individu) |
+| `/lapangan?id=N` | GET | Data for a specific court (full, individual) |
+| `/vmix?id=N` | GET | Nested match data (individual) |
+| `/events?limit=N` | GET | Event history (default: last 100) |
+| `/debug?id=N` | GET | Debug internal data structure (individual) |
+| `/debug-beregu?id=N` | GET | Debug internal data structure (team event, beregu) |
+| `/clear` | GET | Clear all stored data (individual & team event) |
 
 ---
 
@@ -252,56 +252,56 @@ XML untuk turnamen tim; struktur sama dengan `/vmix-xml` ditambah
 
 ### Flat JSON (`/vmix-flat` & `/vmix-flat-beregu`)
 
-**Field Mapping untuk vMix:**
+**Field Mapping for vMix:**
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `court` | Nomor lapangan | `"1"` |
-| `status` | Status match | `"waiting"`, `"on_court"`, `"playing"`, `"finished"` |
-| `tournament_name` | Nama turnamen (kosong di beregu) | `"TTA Divisi I"` |
-| `round` | Round (kosong di beregu) | `"R2"`, `"QF"`, `"SF"`, `"F"` |
-| `match_number` | Nomor match (beregu: nomor partai) | `12` |
-| `teamN_player1_name` | Nama lengkap pemain 1 | `"Muhammad Rizky"` |
-| `teamN_player1_displayName` | Nama pendek pemain 1 | `"Rizky"` |
-| `teamN_player1_club` | Klub pemain 1 | `"Jawa Tengah"` |
-| `teamN_player2_name` / `_displayName` / `_club` | Pemain 2 (ganda) | `"Fauzan"` |
-| `teamN_displayName` | Nama tampil tim (ganda digabung ` / `) | `"Rizky / Fauzan"` |
-| `team1_serve` / `team2_serve` | Tim yang sedang serve (boolean) | `true` |
-| `teamN_setM` | Skor set M (M = 1-3) | `21` |
-| `team1_current` / `team2_current` | Poin game berjalan | `11` / `8` |
-| `winner` | Pemenang (0 = belum ada) | `0` |
-| `retired` | Status retired | `0` |
-| `duration` | Durasi match | `1234` |
-| `last_update` | Timestamp lengkap WIB | `"16 Des 2025, 14:30:04 WIB"` |
-| `update_time` | Jam saja (compact) | `"14:30:04"` |
+| `court` | Court number | `"1"` |
+| `status` | Match status | `"waiting"`, `"on_court"`, `"playing"`, `"finished"` |
+| `tournament_name` | Tournament name (empty in team event) | `"TTA Divisi I"` |
+| `round` | Round (empty in team event) | `"R2"`, `"QF"`, `"SF"`, `"F"` |
+| `match_number` | Match number (team event: partai number) | `12` |
+| `teamN_player1_name` | Full name of player 1 | `"Muhammad Rizky"` |
+| `teamN_player1_displayName` | Short name of player 1 | `"Rizky"` |
+| `teamN_player1_club` | Club of player 1 | `"Jawa Tengah"` |
+| `teamN_player2_name` / `_displayName` / `_club` | Player 2 (doubles) | `"Fauzan"` |
+| `teamN_displayName` | Team display name (doubles joined with ` / `) | `"Rizky / Fauzan"` |
+| `team1_serve` / `team2_serve` | Team currently serving (boolean) | `true` |
+| `teamN_setM` | Score of set M (M = 1-3) | `21` |
+| `team1_current` / `team2_current` | Points in the current game | `11` / `8` |
+| `winner` | Winner (0 = none yet) | `0` |
+| `retired` | Retired status | `0` |
+| `duration` | Match duration | `1234` |
+| `last_update` | Full WIB timestamp | `"16 Des 2025, 14:30:04 WIB"` |
+| `update_time` | Time only (compact) | `"14:30:04"` |
 
-> `N` = `1` atau `2` (nomor tim).
+> `N` = `1` or `2` (team number).
 
-**Field tambahan khusus beregu** (`/vmix-flat-beregu`):
+**Additional team-event-specific fields** (`/vmix-flat-beregu`):
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `partai_type` | Alias jenis partai | `"MD"` |
-| `partai_label` | Nama jenis partai | `"Ganda Putra"` |
-| `current_set` | Set/partai ke berapa yang berjalan | `2` |
-| `sets_won_team1` / `sets_won_team2` | Jumlah set yang sudah dimenangkan | `1` / `0` |
+| `partai_type` | Match type alias | `"MD"` |
+| `partai_label` | Match type name | `"Ganda Putra"` |
+| `current_set` | Which set/partai is in progress | `2` |
+| `sets_won_team1` / `sets_won_team2` | Number of sets already won | `1` / `0` |
 
-Di beregu, nama klub (`teamN_playerM_club`) diisi dengan nama klub tim.
+In team event (beregu), the club name (`teamN_playerM_club`) is filled with the team's club name.
 
 ---
 
-## 🔄 Alur Data
+## 🔄 Data Flow
 
-**Individu**
-- `playgame` / `play` → data match + reset skor untuk match baru
-- `addPoint` / `updatescore` / `updateScore` → skor real-time & serve
-- `clearLapangan` → status `finished`, skor akhir disimpan
+**Singles/Doubles (individu)**
+- `playgame` / `play` → match data + score reset for a new match
+- `addPoint` / `updatescore` / `updateScore` → real-time score & serve
+- `clearLapangan` → status `finished`, final score is kept
 
-**Beregu** (disimpan terpisah dari individu, hanya untuk court yang pernah menerima tie beregu)
-- `addPoint` dengan `klasemen_uid` → skor & serve real-time, **tanpa fetch**
+**Team event (beregu)** (stored separately from individual, only for courts that have received a team event tie)
+- `addPoint` with `klasemen_uid` → real-time score & serve, **without fetch**
 - `ligaPlay`, `ligaSetpartai`, `ligaClearCourt`, `ligaLineupUpdated`, `ligaScoreUpdate`
-  → hanya sinyal untuk refresh *context* (nama klub/pemain, jenis partai)
-  lewat `/ligatie/joinRoomWasit`, di-debounce 800 ms per court
+  → only signals to refresh the *context* (club/player names, match type)
+  via `/ligatie/joinRoomWasit`, debounced 800 ms per court
 
 ---
 
@@ -314,10 +314,10 @@ Di beregu, nama klub (`teamN_playerM_club`) diisi dengan nama klub tim.
    start.bat
    ```
 
-2. **Add Web Input di vMix:**
+2. **Add Web Input in vMix:**
    - Add Input → Web Browser
-   - URL individu: `http://localhost:6969/vmix-flat?id=1`
-   - URL beregu: `http://localhost:6969/vmix-flat-beregu?id=1`
+   - Singles/doubles (individu) URL: `http://localhost:6969/vmix-flat?id=1`
+   - Team event (beregu) URL: `http://localhost:6969/vmix-flat-beregu?id=1`
    - Check "Reload every 1000ms" (1 second)
 
 3. **Create GT Title:**
@@ -377,12 +377,12 @@ docker run -p 6969:6969 --env-file .env livescore-listener
 ```
 livescore-listener/
 │
-├── livescore-listener-wib.js     # Main application (individu + beregu)
-├── debug-socket.js                # Debug koneksi socket
-├── test-connection.js             # Test koneksi (npm test)
+├── livescore-listener-wib.js     # Main application (individual + team event)
+├── debug-socket.js                # Socket connection debugging
+├── test-connection.js             # Connection test (npm test)
 ├── package.json                   # Dependencies
-├── env.example                    # Template konfigurasi
-├── .env                           # Configuration (salinan env.example)
+├── env.example                    # Configuration template
+├── .env                           # Configuration (copy of env.example)
 │
 ├── install.bat                    # Windows installer
 │   └── (generate) start.bat, stop.bat, status.bat, test.bat,
@@ -404,7 +404,7 @@ livescore-listener/
 
 **Check Node.js:**
 ```bash
-node --version  # Should be v16+
+node --version  # Should be v20+
 npm --version
 ```
 
@@ -466,7 +466,7 @@ pm2 logs livescore-listener
 curl http://localhost:6969/events?limit=20
 ```
 
-**Check lapangan data:**
+**Check court data:**
 ```bash
 curl http://localhost:6969/lapangan?id=1
 ```
@@ -479,17 +479,17 @@ start.bat
 
 ---
 
-### Endpoint beregu 404 (`Court not found (beregu)`)
+### Team event (beregu) endpoint 404 (`Court not found (beregu)`)
 
-Court beregu baru dibuat setelah menerima event beregu pertama
-(`addPoint` dengan `klasemen_uid` atau event `liga*`). Mulai pertandingan
-di wasit beregu dulu, lalu cek:
+A team event (beregu) court is only created after receiving the first team event
+event (`addPoint` with `klasemen_uid` or a `liga*` event). Start a match
+in the team event (beregu) referee app (wasit) first, then check:
 ```bash
 curl http://localhost:6969/debug-beregu?id=1
 ```
 
-Jika `context` kosong, cek log `Beregu context fetch gagal` — artinya
-`/ligatie/joinRoomWasit` tidak bisa diakses dari listener.
+If `context` is empty, check the log `Beregu context fetch gagal` — it means
+`/ligatie/joinRoomWasit` cannot be reached from the listener.
 
 **Full guide:** See [Dokumentasi/INSTALL-WINDOWS.md](Dokumentasi/INSTALL-WINDOWS.md) → Troubleshooting section
 
@@ -497,10 +497,10 @@ Jika `context` kosong, cek log `Beregu context fetch gagal` — artinya
 
 ## 📖 Documentation
 
-- **[INSTALL-WINDOWS.md](Dokumentasi/INSTALL-WINDOWS.md)** - Panduan instalasi lengkap untuk Windows
-- **[VMIX-SETUP.md](Dokumentasi/VMIX-SETUP.md)** - Setup vMix integration step-by-step
-- **[GIT-INSTALLATION.md](Dokumentasi/GIT-INSTALLATION.md)** - Panduan instalasi Git
-- **[PACKAGE-SUMMARY.md](Dokumentasi/PACKAGE-SUMMARY.md)** - Ringkasan paket
+- **[INSTALL-WINDOWS.md](Dokumentasi/INSTALL-WINDOWS.md)** - Complete installation guide for Windows
+- **[VMIX-SETUP.md](Dokumentasi/VMIX-SETUP.md)** - Step-by-step vMix integration setup
+- **[GIT-INSTALLATION.md](Dokumentasi/GIT-INSTALLATION.md)** - Git installation guide
+- **[PACKAGE-SUMMARY.md](Dokumentasi/PACKAGE-SUMMARY.md)** - Package summary
 
 ---
 
@@ -512,9 +512,9 @@ Jika `context` kosong, cek log `Beregu context fetch gagal` — artinya
 - ✅ HTTP API endpoints
 - ✅ vMix flat JSON format (`/vmix-flat`)
 - ✅ vMix XML format (`/vmix-xml`)
-- ✅ Dukungan beregu: `/vmix-flat-beregu`, `/vmix-xml-beregu`, `/debug-beregu`
-- ✅ Field `team1_serve` / `team2_serve` (update tiap poin, individu & beregu)
-- ✅ Field `teamN_playerM_displayName` dan `teamN_displayName`
+- ✅ Team event (beregu) support: `/vmix-flat-beregu`, `/vmix-xml-beregu`, `/debug-beregu`
+- ✅ `team1_serve` / `team2_serve` fields (updated every point, individual & team event)
+- ✅ `teamN_playerM_displayName` and `teamN_displayName` fields
 - ✅ WIB timezone support
 - ✅ Windows one-click installer
 - ✅ PM2 support
@@ -545,10 +545,10 @@ MIT License - feel free to use in your projects!
 
 ## 🎯 Use Cases
 
-- 🎬 **Streaming/Broadcasting** - Live score overlay untuk streaming badminton
-- 📺 **TV Production** - Real-time scoreboard untuk broadcast TV
-- 🖥️ **LED Display** - Score display untuk venue
-- 📱 **Mobile Apps** - Data source untuk mobile scoreboard apps
+- 🎬 **Streaming/Broadcasting** - Live score overlay for badminton streaming
+- 📺 **TV Production** - Real-time scoreboard for TV broadcast
+- 🖥️ **LED Display** - Score display for the venue
+- 📱 **Mobile Apps** - Data source for mobile scoreboard apps
 - 🌐 **Web Dashboard** - Live match tracking
 
 ---

@@ -1,6 +1,6 @@
 # 🪟 Windows Installation Guide
 
-Panduan lengkap instalasi dan setup **Livescore Listener** di Windows dengan **one-click installer**.
+Complete guide to installing and setting up the **Livescore Listener** on Windows with the **one-click installer**.
 
 ---
 
@@ -17,13 +17,13 @@ Panduan lengkap instalasi dan setup **Livescore Listener** di Windows dengan **o
 ## 🔧 Requirements
 
 ### Minimal Requirements
-- **OS**: Windows 10 atau Windows 11
+- **OS**: Windows 10 or Windows 11
 - **RAM**: 512 MB minimum
 - **Disk**: 100 MB free space
-- **Node.js**: v16.x atau lebih baru (akan diinstall otomatis jika belum ada)
+- **Node.js**: v20.x or newer (installed automatically if not present)
 
 ### Download Requirements
-Jika Node.js belum terinstall:
+If Node.js is not installed yet:
 - Download: [Node.js LTS](https://nodejs.org/en/download/)
 - Choose: Windows Installer (.msi) - 64-bit
 
@@ -33,9 +33,9 @@ Jika Node.js belum terinstall:
 
 ### Method 1: Batch Installer
 
-1. **Extract semua files** ke folder (misal: `C:\livescore-listener\`)
+1. **Extract all files** to a folder (e.g. `C:\livescore-listener\`)
 
-2. **Klik kanan `install.bat`** → **Run as Administrator**
+2. **Right-click `install.bat`** → **Run as Administrator**
 
 3. **Follow the installer prompts:**
    ```
@@ -47,11 +47,11 @@ Jika Node.js belum terinstall:
    ```
 
 4. **Edit configuration** (optional):
-   - Edit file `.env`
+   - Edit the `.env` file
    - Change `LIVESCORE_HOST`, `DAFTAR_LAPANGAN`, `PORT`
 
 5. **Run the application:**
-   - Double-click **"Livescore Listener - Start"** shortcut di desktop
+   - Double-click the **"Livescore Listener - Start"** shortcut on the desktop
    - Or run `start.bat`
 
 ✅ **Done!** Application is running on `http://localhost:6969`
@@ -60,19 +60,19 @@ Jika Node.js belum terinstall:
 
 ## 🔨 Manual Installation
 
-Jika prefer instalasi manual:
+If you prefer manual installation:
 
 ### Step 1: Install Node.js
 ```
-1. Download Node.js LTS dari https://nodejs.org/
-2. Run installer dan follow wizard
+1. Download Node.js LTS from https://nodejs.org/
+2. Run the installer and follow the wizard
 3. Restart Command Prompt
 4. Verify: node --version
 ```
 
 ### Step 2: Extract Files
 ```
-Extract semua files ke folder:
+Extract all files to the folder:
 C:\livescore-listener\
 ```
 
@@ -83,7 +83,7 @@ npm install
 ```
 
 ### Step 4: Create .env File
-Create file `.env` dengan isi:
+Create a `.env` file with the following content:
 ```env
 LIVESCORE_HOST=http://localhost:1337
 DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8,9,10,11,12
@@ -100,7 +100,7 @@ node livescore-listener-wib.js
 ## 🚀 Running the Application
 
 ### Option 1: Desktop Shortcut
-Double-click shortcut di desktop:
+Double-click a shortcut on the desktop:
 - **"Livescore Listener - Start"** → Start application
 - **"Livescore Listener - Status"** → Check status
 
@@ -140,7 +140,7 @@ node livescore-listener-wib.js
 
 ### Option 4: PM2 (Advanced)
 
-Jika sudah install PM2 saat instalasi:
+If you installed PM2 during installation:
 
 **Start as service:**
 ```cmd
@@ -176,11 +176,11 @@ pm2 status
 
 ## 🔄 Windows Service Setup
 
-Install sebagai Windows Service agar running otomatis saat booting.
+Install as a Windows Service so it runs automatically at boot.
 
 ### Using PM2 (Recommended)
 
-1. **Install PM2** (jika belum):
+1. **Install PM2** (if not installed yet):
    ```cmd
    npm install -g pm2
    npm install -g pm2-windows-startup
@@ -201,7 +201,7 @@ Install sebagai Windows Service agar running otomatis saat booting.
    pm2 save
    ```
 
-5. **Done!** Service akan auto-start saat booting
+5. **Done!** The service will auto-start at boot
 
 ---
 
@@ -265,19 +265,19 @@ Should return:
 ---
 
 ### 3. Test vMix Endpoint
-Individu:
+Individual:
 ```
 http://localhost:6969/vmix-flat?id=1
 ```
 
-Beregu (turnamen tim):
+Team event (beregu, team tournament):
 ```
 http://localhost:6969/vmix-flat-beregu?id=1
 ```
 
-Should return flat JSON data (dalam bentuk array). Endpoint beregu
-mengembalikan `404 Court not found (beregu)` sampai ada event beregu pertama
-di court tersebut; cek `http://localhost:6969/debug-beregu?id=1`.
+Should return flat JSON data (as an array). The team event endpoint
+returns `404 Court not found (beregu)` until the first team event (beregu)
+event arrives on that court; check `http://localhost:6969/debug-beregu?id=1`.
 
 ---
 
@@ -302,7 +302,7 @@ Open `.env` with Notepad:
 # Livescore host URL
 LIVESCORE_HOST=http://your-server:1337
 
-# Daftar lapangan (comma separated)
+# Court list (comma separated)
 DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
 
 # HTTP Server Port
@@ -318,7 +318,7 @@ PORT=6969
 
 ## 🔥 Firewall Configuration
 
-Jika tidak bisa akses dari komputer lain:
+If you cannot access it from another computer:
 
 ### Windows Firewall
 
@@ -334,7 +334,7 @@ Jika tidak bisa akses dari komputer lain:
    - Action: Allow
    - Name: "Livescore Listener"
 
-3. **Done!** Port 6969 now accessible from other computers
+3. **Done!** Port 6969 is now accessible from other computers
 
 ---
 
@@ -428,18 +428,18 @@ Recreate shortcuts manually:
 ```
 C:\livescore-listener\
 │
-├── livescore-listener-wib.js    # Main application (individu + beregu)
+├── livescore-listener-wib.js    # Main application (individual + team event/beregu)
 ├── package.json                  # Dependencies
 ├── env.example                   # Config template
 ├── .env                          # Configuration
-├── ecosystem.config.js           # PM2 config (optional, dibuat installer)
+├── ecosystem.config.js           # PM2 config (optional, created by installer)
 │
 ├── install.bat                   # Batch installer
 │
-├── start.bat                     # Start script (dibuat installer)
-├── stop.bat                      # Stop script (dibuat installer)
-├── status.bat                    # Status check (dibuat installer)
-├── test.bat                      # Test script (dibuat installer)
+├── start.bat                     # Start script (created by installer)
+├── stop.bat                      # Stop script (created by installer)
+├── status.bat                    # Status check (created by installer)
+├── test.bat                      # Test script (created by installer)
 │
 └── Dokumentasi\
     ├── INSTALL-WINDOWS.md        # This file
@@ -524,7 +524,7 @@ NODE_ENV=development
 
 ## ✅ Installation Checklist
 
-- [ ] Node.js installed (v16+)
+- [ ] Node.js installed (v20+)
 - [ ] Files extracted to folder
 - [ ] Ran `install.bat`
 - [ ] Dependencies installed (npm install)
@@ -559,7 +559,7 @@ http://localhost:6969/vmix-flat?id=1
 
 ## 📚 Additional Documentation
 
-- **vMix Integration** (individu & beregu): See [VMIX-SETUP.md](VMIX-SETUP.md)
+- **vMix Integration** (individual & team event/beregu): See [VMIX-SETUP.md](VMIX-SETUP.md)
 - **API Endpoints & Response Format**: See [README.md](../README.md)
 - **Git Installation**: See [GIT-INSTALLATION.md](GIT-INSTALLATION.md)
 

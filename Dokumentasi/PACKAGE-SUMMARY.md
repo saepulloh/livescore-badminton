@@ -2,7 +2,7 @@
 
 ## 📦 What's Included
 
-Anda sekarang memiliki **complete production-ready package** untuk Livescore Listener dengan Windows one-click installer!
+You now have a **complete production-ready package** for Livescore Listener with a Windows one-click installer!
 
 ---
 
@@ -11,9 +11,9 @@ Anda sekarang memiliki **complete production-ready package** untuk Livescore Lis
 ### 🚀 Core Application
 | File | Description |
 |------|-------------|
-| `livescore-listener-wib.js` | Main application (individu + beregu, WIB timestamp) |
-| `debug-socket.js` | Debug koneksi socket |
-| `test-connection.js` | Test koneksi (`npm test`) |
+| `livescore-listener-wib.js` | Main application (individual (individu) + team event (beregu), WIB timestamp) |
+| `debug-socket.js` | Socket connection debugging |
+| `test-connection.js` | Connection test (`npm test`) |
 | `package.json` | Dependencies & scripts configuration |
 | `env.example` | Configuration template |
 | `.gitignore` | Git ignore file |
@@ -37,7 +37,7 @@ Anda sekarang memiliki **complete production-ready package** untuk Livescore Lis
 |------|-------------|----------|
 | `README.md` | Main documentation | ⭐⭐⭐ |
 | `Dokumentasi/INSTALL-WINDOWS.md` | Complete Windows guide | ⭐⭐ |
-| `Dokumentasi/VMIX-SETUP.md` | vMix integration guide (individu & beregu) | ⭐⭐⭐ |
+| `Dokumentasi/VMIX-SETUP.md` | vMix integration guide (individual & team event) | ⭐⭐⭐ |
 | `Dokumentasi/GIT-INSTALLATION.md` | Git installation guide | ⭐ |
 | `Dokumentasi/PACKAGE-SUMMARY.md` | This file | ⭐ |
 
@@ -47,15 +47,15 @@ Anda sekarang memiliki **complete production-ready package** untuk Livescore Lis
 
 ### For End Users (Non-Technical)
 
-1. **Extract files** ke folder (e.g., `C:\livescore-listener\`)
+1. **Extract files** to a folder (e.g., `C:\livescore-listener\`)
 
 2. **Run ONE-CLICK INSTALLER:**
-   - Klik kanan `install.bat`
-   - Pilih **"Run as Administrator"**
+   - Right-click `install.bat`
+   - Select **"Run as Administrator"**
    - Follow the prompts (installer will do everything!)
 
 3. **Configure** (if needed):
-   - Edit `.env` file dengan Notepad
+   - Edit the `.env` file with Notepad
    - Set your livescore server URL
 
 4. **Start:**
@@ -94,8 +94,8 @@ curl http://localhost:6969/status
 
 2. **In vMix:**
    - Add Input → Web Browser
-   - URL individu: `http://localhost:6969/vmix-flat?id=1`
-   - URL beregu: `http://localhost:6969/vmix-flat-beregu?id=1`
+   - Individual URL: `http://localhost:6969/vmix-flat?id=1`
+   - Team event (beregu) URL: `http://localhost:6969/vmix-flat-beregu?id=1`
    - Tick "Reload every 1000ms"
 
 3. **Create GT Title:**
@@ -116,22 +116,22 @@ curl http://localhost:6969/status
 
 ### For vMix (Recommended)
 
-**Individu — Flat JSON (Best for vMix):**
+**Individual (individu) — Flat JSON (Best for vMix):**
 ```
 http://localhost:6969/vmix-flat?id=1
 ```
 
-**Individu — XML Format:**
+**Individual — XML Format:**
 ```
 http://localhost:6969/vmix-xml?id=1
 ```
 
-**Beregu (turnamen tim) — Flat JSON:**
+**Team event (beregu, team tournament) — Flat JSON:**
 ```
 http://localhost:6969/vmix-flat-beregu?id=1
 ```
 
-**Beregu (turnamen tim) — XML Format:**
+**Team event (beregu, team tournament) — XML Format:**
 ```
 http://localhost:6969/vmix-xml-beregu?id=1
 ```
@@ -163,10 +163,10 @@ http://localhost:6969/lapangan?id=1
 http://localhost:6969/events?limit=20
 ```
 
-**Debug Data Internal:**
+**Internal Debug Data:**
 ```
-http://localhost:6969/debug?id=1          # individu
-http://localhost:6969/debug-beregu?id=1   # beregu
+http://localhost:6969/debug?id=1          # individual
+http://localhost:6969/debug-beregu?id=1   # team event
 ```
 
 ---
@@ -197,7 +197,7 @@ PORT=6969
 → Read `INSTALL-WINDOWS.md` (comprehensive guide)
 
 ### I need vMix integration
-→ Read `VMIX-SETUP.md` (step-by-step with examples, individu & beregu)
+→ Read `VMIX-SETUP.md` (step-by-step with examples, individual & team event (beregu))
 
 ### I want to understand the API
 → Read the API Endpoints & Response Format sections in `README.md`
@@ -224,8 +224,8 @@ This package is perfect for:
 - ✅ **One-Click Installation** - Windows installer handles everything
 - ✅ **vMix Ready** - Optimized formats for vMix integration
 - ✅ **Real-Time Updates** - Score updates every second
-- ✅ **Individu & Beregu** - Endpoint terpisah untuk pertandingan individu dan turnamen tim
-- ✅ **Serve Indicator** - `team1_serve` / `team2_serve` update tiap poin
+- ✅ **Individual & Team Event** - Separate endpoints for individual matches and team tournaments (team event (beregu))
+- ✅ **Serve Indicator** - `team1_serve` / `team2_serve` update every point
 - ✅ **Multi-Court Support** - Monitor up to 12 courts simultaneously
 - ✅ **WIB Timezone** - Readable timestamps in WIB format
 - ✅ **No Database** - Lightweight, runs in memory
@@ -292,7 +292,7 @@ DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
 # Allow access from other PCs
 # Configure Windows Firewall to allow port 6969
 # vMix PC can access: http://192.168.1.100:6969/vmix-flat?id=1
-# (beregu: http://192.168.1.100:6969/vmix-flat-beregu?id=1)
+# (team event: http://192.168.1.100:6969/vmix-flat-beregu?id=1)
 ```
 
 ### Tip 4: Test Before Live
@@ -300,7 +300,7 @@ DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
 # Always test before live event
 curl http://localhost:6969/status
 curl http://localhost:6969/vmix-flat?id=1
-curl http://localhost:6969/vmix-flat-beregu?id=1   # jika turnamen beregu
+curl http://localhost:6969/vmix-flat-beregu?id=1   # if it is a team event tournament
 ```
 
 ---
@@ -310,7 +310,7 @@ curl http://localhost:6969/vmix-flat-beregu?id=1   # jika turnamen beregu
 ### Application won't start
 ```bash
 # Check Node.js
-node --version  # Should be v16+
+node --version  # Should be v20+
 
 # Reinstall dependencies
 npm install
@@ -349,7 +349,7 @@ start.bat
 
 ### Files You Have
 - [x] `livescore-listener-wib.js` - Main application
-- [x] `debug-socket.js` / `test-connection.js` - Debug & test koneksi
+- [x] `debug-socket.js` / `test-connection.js` - Connection debug & test
 - [x] `package.json` - Dependencies
 - [x] `env.example` - Config template
 - [x] `.gitignore` - Git ignore
@@ -382,7 +382,7 @@ start.bat
 
 ### Advanced (Production Deployment)
 1. Read all documentation (60 min)
-2. Test all scenarios, individu dan beregu (60 min)
+2. Test all scenarios, individual and team event (60 min)
 3. **Total: 120 minutes**
 
 ---
@@ -402,7 +402,7 @@ start.bat
 4. **Test** with live match
 
 ### For Production Deployment:
-1. **Test** all scenarios (individu & beregu)
+1. **Test** all scenarios (individual & team event)
 2. **Configure** Windows Firewall
 3. **Setup** PM2 service mode
 4. **Monitor** performance

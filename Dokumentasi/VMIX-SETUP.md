@@ -1,38 +1,38 @@
 # 🎬 vMix Integration Guide
 
-Panduan lengkap untuk mengintegrasikan livescore-listener dengan vMix untuk menampilkan scoreboard badminton secara real-time, baik untuk **pertandingan individu** maupun **beregu (turnamen tim)**.
+A complete guide to integrating livescore-listener with vMix to display a badminton scoreboard in real time, for both **individual (individu) matches** and **team events (beregu, team tournaments)**.
 
 ---
 
-## 📋 Daftar Isi
-- [Individu vs Beregu](#individu-vs-beregu)
-- [Endpoint yang Tersedia](#endpoint-yang-tersedia)
-- [Setup vMix - Flat JSON](#setup-vmix---flat-json-recommended)
-- [Setup vMix - XML](#setup-vmix---xml)
-- [Contoh Data](#contoh-data)
+## 📋 Table of Contents
+- [Individual vs Team Event (Beregu)](#individual-vs-team-event-beregu)
+- [Available Endpoints](#available-endpoints)
+- [vMix Setup - Flat JSON](#vmix-setup---flat-json-recommended)
+- [vMix Setup - XML](#vmix-setup---xml)
+- [Sample Data](#sample-data)
 - [Field Mapping](#field-mapping)
 - [Troubleshooting](#troubleshooting)
 
 ---
 
-## 🔀 Individu vs Beregu
+## 🔀 Individual vs Team Event (Beregu)
 
-Listener menyimpan data individu dan beregu **secara terpisah**. Operator broadcast memilih URL sesuai jenis turnamen yang sedang berlangsung:
+The listener stores individual (individu) and team event (beregu) data **separately**. The broadcast operator picks the URL that matches the type of tournament currently running:
 
-| Jenis turnamen | JSON ⭐ | XML |
-|----------------|--------|-----|
-| **Individu** | `/vmix-flat?id=N` | `/vmix-xml?id=N` |
-| **Beregu** (tim, 3x55) | `/vmix-flat-beregu?id=N` | `/vmix-xml-beregu?id=N` |
+| Tournament type | JSON ⭐ | XML |
+|-----------------|--------|-----|
+| **Individual** | `/vmix-flat?id=N` | `/vmix-xml?id=N` |
+| **Team event** (team, 3x55) | `/vmix-flat-beregu?id=N` | `/vmix-xml-beregu?id=N` |
 
-Nama field di kedua jenis **sama**, sehingga GT Title individu bisa dipakai ulang untuk beregu cukup dengan mengganti URL. Beregu hanya menambah beberapa field (lihat [Field Mapping](#field-mapping)).
+Field names are **the same** for both types, so an individual GT Title can be reused for team events just by changing the URL. Team events only add a few fields (see [Field Mapping](#field-mapping)).
 
 ---
 
-## 🔗 Endpoint yang Tersedia
+## 🔗 Available Endpoints
 
-### 1. `/vmix-flat?id=N` dan `/vmix-flat-beregu?id=N` ⭐ **RECOMMENDED**
-Format: **Flat JSON** (dibungkus array: `[ {...} ]`)  
-Cocok untuk: **GT Title Designer** atau **Web input**
+### 1. `/vmix-flat?id=N` and `/vmix-flat-beregu?id=N` ⭐ **RECOMMENDED**
+Format: **Flat JSON** (wrapped in an array: `[ {...} ]`)  
+Suitable for: **GT Title Designer** or **Web input**
 
 **URL Example:**
 ```
@@ -40,17 +40,17 @@ http://localhost:6969/vmix-flat?id=1
 http://localhost:6969/vmix-flat-beregu?id=1
 ```
 
-**Keuntungan:**
-- ✅ Struktur flat, mudah di-mapping
-- ✅ Field names simple tanpa nested object
-- ✅ Auto-update setiap poin (skor dan indikator serve)
-- ✅ Format JSON standar
+**Advantages:**
+- ✅ Flat structure, easy to map
+- ✅ Simple field names with no nested objects
+- ✅ Auto-updates on every point (score and serve indicator)
+- ✅ Standard JSON format
 
 ---
 
-### 2. `/vmix-xml?id=N` dan `/vmix-xml-beregu?id=N`
+### 2. `/vmix-xml?id=N` and `/vmix-xml-beregu?id=N`
 Format: **XML**  
-Cocok untuk: **Data Source (XML)**
+Suitable for: **Data Source (XML)**
 
 **URL Example:**
 ```
@@ -58,38 +58,38 @@ http://localhost:6969/vmix-xml?id=1
 http://localhost:6969/vmix-xml-beregu?id=1
 ```
 
-**Keuntungan:**
+**Advantages:**
 - ✅ Native vMix XML support
 - ✅ Easy drag-and-drop mapping
-- ✅ Struktur hierarchical yang jelas
+- ✅ Clear hierarchical structure
 
 ---
 
-### 3. Endpoint debug
-| Endpoint | Fungsi |
-|----------|--------|
-| `/debug?id=N` | Struktur data internal court individu |
-| `/debug-beregu?id=N` | Struktur data internal court beregu (context + liveScore) |
+### 3. Debug endpoints
+| Endpoint | Purpose |
+|----------|---------|
+| `/debug?id=N` | Internal data structure of an individual court |
+| `/debug-beregu?id=N` | Internal data structure of a team event (beregu) court (context + liveScore) |
 
 ---
 
-## 🚀 Setup vMix - Flat JSON (Recommended)
+## 🚀 vMix Setup - Flat JSON (Recommended)
 
 ### Method 1: GT Title Designer + Web Input
 
-#### Step 1: Jalankan livescore-listener
+#### Step 1: Run livescore-listener
 ```bash
 npm start
-# atau
+# or
 node livescore-listener-wib.js
 ```
 
-#### Step 2: Test endpoint di browser
+#### Step 2: Test the endpoint in a browser
 ```
 http://localhost:6969/vmix-flat?id=1
 ```
 
-Pastikan data muncul seperti ini:
+Make sure the data appears like this:
 ```json
 [
   {
@@ -115,12 +115,12 @@ Pastikan data muncul seperti ini:
 ]
 ```
 
-#### Step 3: Buat Title di GT Title Designer
-1. Buka **GT Title Designer**
-2. Buat title baru atau edit existing
-3. Tambahkan **Text fields** dengan data binding:
+#### Step 3: Create a Title in GT Title Designer
+1. Open **GT Title Designer**
+2. Create a new title or edit an existing one
+3. Add **Text fields** with data binding:
 
-**Contoh Field Mapping (individu & beregu):**
+**Field Mapping Example (individual & team event):**
 ```
 Team 1 Name  → team1_displayName
 Team 1 Club  → team1_player1_club
@@ -139,34 +139,34 @@ Round        → round
 Status       → status
 ```
 
-**Tambahan khusus beregu:**
+**Team event (beregu) extras:**
 ```
-Jenis Partai → partai_label    (mis. "Ganda Putra")
-Partai ke    → current_set
-Skor Tie     → sets_won_team1 - sets_won_team2
+Match Type   → partai_label    (e.g. "Ganda Putra")
+Match No.    → current_set
+Tie Score    → sets_won_team1 - sets_won_team2
 ```
 
-#### Step 4: Add Web Input di vMix
+#### Step 4: Add Web Input in vMix
 1. **Add Input** → **Web Browser**
-2. URL individu: `http://localhost:6969/vmix-flat?id=1`  
-   URL beregu: `http://localhost:6969/vmix-flat-beregu?id=1`
-3. Tick "**Reload every 1000ms**" (1 detik)
+2. Individual URL: `http://localhost:6969/vmix-flat?id=1`  
+   Team event URL: `http://localhost:6969/vmix-flat-beregu?id=1`
+3. Tick "**Reload every 1000ms**" (1 second)
 4. **OK**
 
-#### Step 5: Link GT Title dengan Web Input
-1. Pilih GT Title input
-2. Klik **Data Source** button
-3. Pilih **Web**
-4. Select Web input yang sudah dibuat (step 4)
+#### Step 5: Link the GT Title to the Web Input
+1. Select the GT Title input
+2. Click the **Data Source** button
+3. Choose **Web**
+4. Select the Web input you created (step 4)
 5. **OK**
 
-✅ **Done!** Score akan auto-update setiap 1 detik!
+✅ **Done!** The score will auto-update every 1 second!
 
 ---
 
 ### Method 2: Script (Advanced - Direct JSON)
 
-#### Step 1: Add Script di vMix
+#### Step 1: Add a Script in vMix
 ```javascript
 // vMix Script Example
 var API = API;
@@ -176,7 +176,7 @@ function updateScore() {
     httpRequest.open('GET', 'http://localhost:6969/vmix-flat?id=1', true);
     httpRequest.onreadystatechange = function() {
         if (httpRequest.readyState === 4 && httpRequest.status === 200) {
-            // Response berupa array, ambil elemen pertama
+            // The response is an array, take the first element
             var data = JSON.parse(httpRequest.responseText)[0];
 
             // Update vMix Title fields
@@ -192,31 +192,31 @@ function updateScore() {
                 Value: data.team1_set1
             });
 
-            // ... update field lainnya
+            // ... update the other fields
         }
     };
     httpRequest.send();
 }
 
-// Update setiap 1 detik
+// Update every 1 second
 setInterval(updateScore, 1000);
 ```
 
 ---
 
-## 📝 Setup vMix - XML
+## 📝 vMix Setup - XML
 
-### Step 1: Jalankan livescore-listener
+### Step 1: Run livescore-listener
 ```bash
 npm start
 ```
 
-### Step 2: Test XML endpoint
+### Step 2: Test the XML endpoint
 ```
 http://localhost:6969/vmix-xml?id=1
 ```
 
-Akan menghasilkan XML seperti:
+It will produce XML like:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <match>
@@ -269,32 +269,32 @@ Akan menghasilkan XML seperti:
 </match>
 ```
 
-Untuk **beregu** (`/vmix-xml-beregu?id=1`) strukturnya sama, dengan tambahan elemen
-`<partai_type>`, `<partai_label>`, `<current_set>` di level atas dan
-`<sets_won_team1>`, `<sets_won_team2>` di dalam `<scores>`.
+For **team events (beregu)** (`/vmix-xml-beregu?id=1`) the structure is the same, with the additional elements
+`<partai_type>`, `<partai_label>`, `<current_set>` at the top level and
+`<sets_won_team1>`, `<sets_won_team2>` inside `<scores>`.
 
-### Step 3: Add Data Source di vMix
+### Step 3: Add a Data Source in vMix
 1. **Add Input** → **Data Source**
 2. Type: **XML**
-3. URL: `http://localhost:6969/vmix-xml?id=1` (atau `/vmix-xml-beregu?id=1`)
-4. **Auto Update**: `1000` (1 detik)
+3. URL: `http://localhost:6969/vmix-xml?id=1` (or `/vmix-xml-beregu?id=1`)
+4. **Auto Update**: `1000` (1 second)
 5. **OK**
 
-### Step 4: Create Title dan Bind Data
-1. Buat GT Title
+### Step 4: Create a Title and Bind Data
+1. Create a GT Title
 2. Add text fields
-3. Right-click text → **Data Source**
-4. Pilih XML data source
-5. Navigate ke field (contoh: `match/team1/displayName`)
+3. Right-click the text → **Data Source**
+4. Choose the XML data source
+5. Navigate to the field (example: `match/team1/displayName`)
 6. **OK**
 
-✅ **Done!** vMix akan auto-fetch XML setiap 1 detik!
+✅ **Done!** vMix will auto-fetch the XML every 1 second!
 
 ---
 
-## 📊 Contoh Data
+## 📊 Sample Data
 
-### Flat JSON Response Individu (`/vmix-flat?id=1`)
+### Flat JSON Response, Individual (`/vmix-flat?id=1`)
 ```json
 [
   {
@@ -341,8 +341,8 @@ Untuk **beregu** (`/vmix-xml-beregu?id=1`) strukturnya sama, dengan tambahan ele
 ]
 ```
 
-### Flat JSON Response Beregu (`/vmix-flat-beregu?id=1`)
-Field sama dengan individu, ditambah di bagian akhir:
+### Flat JSON Response, Team Event (`/vmix-flat-beregu?id=1`)
+Same fields as individual, with these added at the end:
 ```json
 [
   {
@@ -358,7 +358,7 @@ Field sama dengan individu, ditambah di bagian akhir:
     "team1_displayName": "Rizky / Fauzan",
     "team1_serve": true,
 
-    "...": "(field skor, winner, duration, dst. sama dengan individu)",
+    "...": "(score fields, winner, duration, etc. same as individual)",
 
     "partai_type": "MD",
     "partai_label": "Ganda Putra",
@@ -371,120 +371,120 @@ Field sama dengan individu, ditambah di bagian akhir:
 ]
 ```
 
-> Di beregu, `tournament_name` dan `round` selalu kosong (belum ada sumbernya di payload backend), dan `teamN_playerM_club` berisi nama klub tim.
+> In team events, `tournament_name` and `round` are always empty (the backend payload has no source for them yet), and `teamN_playerM_club` contains the team's club name.
 
 ---
 
 ## 🗺️ Field Mapping
 
-`N` = `1` atau `2` (nomor tim), `M` = `1` atau `2` (pemain 1 atau 2 / partner ganda).
+`N` = `1` or `2` (team number), `M` = `1` or `2` (player 1 or 2 / doubles partner).
 
-| Field vMix | JSON Field | Deskripsi |
-|------------|-----------|-----------|
-| **Lapangan** | `court` | Nomor lapangan (1-12) |
+| vMix Field | JSON Field | Description |
+|------------|-----------|-------------|
+| **Court** | `court` | Court number (1-12) |
 | **Status** | `status` | `waiting`, `on_court`, `playing`, `finished` |
-| **Turnamen** | `tournament_name` | Nama turnamen/kategori (kosong di beregu) |
-| **Round** | `round` | R1, R2, QF, SF, F, dll (kosong di beregu) |
-| **Match #** | `match_number` | Nomor urut pertandingan (beregu: nomor partai) |
+| **Tournament** | `tournament_name` | Tournament/category name (empty in team events) |
+| **Round** | `round` | R1, R2, QF, SF, F, etc. (empty in team events) |
+| **Match #** | `match_number` | Match sequence number (team event: match number within the tie) |
 | | |
-| **Team N Nama Lengkap** | `teamN_playerM_name` | Nama lengkap pemain M |
-| **Team N Nama Pendek** | `teamN_playerM_displayName` | Nama pendek/tampil pemain M |
-| **Team N Club** | `teamN_playerM_club` | Klub/daerah pemain M |
-| **Team N Nama Tim** | `teamN_displayName` | Nama tampil tim; ganda digabung ` / ` |
-| **Team N Serve** | `teamN_serve` | `true` jika tim N sedang serve |
+| **Team N Full Name** | `teamN_playerM_name` | Full name of player M |
+| **Team N Short Name** | `teamN_playerM_displayName` | Short/display name of player M |
+| **Team N Club** | `teamN_playerM_club` | Club/region of player M |
+| **Team N Team Name** | `teamN_displayName` | Team display name; doubles joined with ` / ` |
+| **Team N Serve** | `teamN_serve` | `true` if team N is serving |
 | | |
-| **Set M Team N** | `teamN_setM` | Score set M (1-3) tim N |
-| **Current Team N** | `teamN_current` | Point game berjalan tim N |
+| **Set M Team N** | `teamN_setM` | Team N's score in set M (1-3) |
+| **Current Team N** | `teamN_current` | Team N's points in the current game |
 | | |
-| **Winner** | `winner` | ID pemenang (0 = belum selesai) |
-| **Retired** | `retired` | Status retired |
-| **Duration** | `duration` | Durasi pertandingan |
-| **Last Update** | `last_update` | Timestamp lengkap WIB |
-| **Update Time** | `update_time` | Jam saja (HH:MM:SS) |
+| **Winner** | `winner` | Winner ID (0 = not finished yet) |
+| **Retired** | `retired` | Retired status |
+| **Duration** | `duration` | Match duration |
+| **Last Update** | `last_update` | Full WIB timestamp |
+| **Update Time** | `update_time` | Time only (HH:MM:SS) |
 
-**Khusus beregu:**
+**Team event (beregu) only:**
 
-| Field vMix | JSON Field | Deskripsi |
-|------------|-----------|-----------|
-| **Kode Partai** | `partai_type` | Alias jenis partai (mis. `MD`) |
-| **Jenis Partai** | `partai_label` | Nama jenis partai (mis. Ganda Putra) |
-| **Partai/Set ke** | `current_set` | Set/partai yang sedang berjalan |
-| **Set Menang T1** | `sets_won_team1` | Jumlah set yang dimenangkan tim 1 |
-| **Set Menang T2** | `sets_won_team2` | Jumlah set yang dimenangkan tim 2 |
+| vMix Field | JSON Field | Description |
+|------------|-----------|-------------|
+| **Match Code** | `partai_type` | Alias of the match type (e.g. `MD`) |
+| **Match Type** | `partai_label` | Name of the match type (e.g. Ganda Putra) |
+| **Current Match/Set** | `current_set` | The set/match currently in progress |
+| **Sets Won T1** | `sets_won_team1` | Number of sets won by team 1 |
+| **Sets Won T2** | `sets_won_team2` | Number of sets won by team 2 |
 
 ---
 
 ## 🔧 Troubleshooting
 
-### ❌ Data tidak update
-**Cek:**
-1. Apakah `livescore-listener` jalan?
+### ❌ Data is not updating
+**Check:**
+1. Is `livescore-listener` running?
    ```bash
    curl http://localhost:6969/status
    ```
 
-2. Apakah socket terkoneksi?
+2. Is the socket connected?
    ```bash
    curl http://localhost:6969/status
-   # Cari: "connectionStatus": "connected"
+   # Look for: "connectionStatus": "connected"
    ```
 
-3. Apakah ada events masuk?
+3. Are events coming in?
    ```bash
    curl http://localhost:6969/events?limit=10
    ```
 
-4. Apakah vMix auto-reload aktif?
+4. Is vMix auto-reload active?
    - Check Web Input settings → Reload interval
-   - Recommended: 1000ms (1 detik)
+   - Recommended: 1000ms (1 second)
 
-### ❌ Field mapping tidak jalan
-**Cek:**
-1. Field name di GT Title harus **exact match**
+### ❌ Field mapping does not work
+**Check:**
+1. Field names in the GT Title must **match exactly**
 2. Case-sensitive: `team1_displayName` ≠ `team1_displayname`
-3. Test data dulu di browser sebelum integrate
-4. Response `vmix-flat` berupa **array** — pastikan binding membaca elemen pertama
+3. Test the data in a browser before integrating
+4. The `vmix-flat` response is an **array**, so make sure the binding reads the first element
 
-### ❌ Score lambat update
-**Solusi:**
-1. Kurangi reload interval ke 500ms atau 1000ms
-2. Pastikan tidak ada network latency
-3. Check CPU usage vMix (jangan terlalu tinggi)
+### ❌ Score updates slowly
+**Solutions:**
+1. Reduce the reload interval to 500ms or 1000ms
+2. Make sure there is no network latency
+3. Check vMix CPU usage (it should not be too high)
 
 ### ❌ Error "Court not found"
-**Cek:**
-1. Apakah lapangan ada di `DAFTAR_LAPANGAN`?
+**Check:**
+1. Is the court listed in `DAFTAR_LAPANGAN`?
    ```bash
    # .env
    DAFTAR_LAPANGAN=1,2,3,4,5,6,7,8
    ```
 
-2. Apakah sudah join room?
+2. Has it joined the room?
    ```bash
    curl http://localhost:6969/status
-   # Cari: "joinedRooms": ["court_1", "court_2", ...]
+   # Look for: "joinedRooms": ["court_1", "court_2", ...]
    ```
 
 ### ❌ Error "Court not found (beregu)"
-Court beregu baru dibuat setelah listener menerima event beregu pertama
-(`addPoint` dengan `klasemen_uid`, atau event `liga*`). Mulai pertandingan di
-wasit beregu dulu, lalu cek:
+A team event (beregu) court is only created after the listener receives the first team event
+(`addPoint` with `klasemen_uid`, or a `liga*` event). Start a match in the
+team event referee app (wasit beregu) first, then check:
 ```bash
 curl http://localhost:6969/debug-beregu?id=1
 ```
-Jika `context` kosong, lihat log listener (`Beregu context fetch gagal`).
+If `context` is empty, look at the listener log (`Beregu context fetch gagal`).
 
-### ❌ Nama pemain/klub beregu kosong
-Nama diambil dari *context* yang di-refresh saat event `liga*` (ganti partai/set), bukan tiap poin. Pastikan wasit sudah menekan PLAY / set partai, atau cek `lastContextFetch` di `/debug-beregu?id=N`.
+### ❌ Team event player/club names are empty
+Names are taken from the *context*, which is refreshed on `liga*` events (changing match/set), not on every point. Make sure the referee has pressed PLAY / set the match, or check `lastContextFetch` in `/debug-beregu?id=N`.
 
-### ❌ Indikator serve tidak berubah
-Serve diambil dari data tiap poin (`addPoint`). Pastikan wasit sudah memilih server/receiver dan ada poin masuk (cek `/events?limit=10`).
+### ❌ Serve indicator does not change
+Serve is taken from the data of each point (`addPoint`). Make sure the referee has chosen the server/receiver and that points are coming in (check `/events?limit=10`).
 
 ---
 
-## 🎨 Tips Desain Scoreboard
+## 🎨 Scoreboard Design Tips
 
-### Minimalis
+### Minimalist
 ```
 ┌──────────────────────────────┐
 │  Muhammad (Jawa Tengah)      │
@@ -514,11 +514,11 @@ Serve diambil dari data tiap poin (`addPoint`). Pastikan wasit sudah memilih ser
 ╚═══════════════════════════════════════╝
 ```
 
-### Indikator Serve
-Gunakan `team1_serve` / `team2_serve` (boolean) untuk menampilkan ikon shuttlecock di sisi tim yang sedang serve, misalnya dengan visibility binding di GT Title.
+### Serve Indicator
+Use `team1_serve` / `team2_serve` (boolean) to show a shuttlecock icon next to the team that is serving, for example with a visibility binding in the GT Title.
 
 ### Highlight Winner
-Gunakan conditional formatting di GT Title:
+Use conditional formatting in the GT Title:
 ```javascript
 // Pseudo-code
 if (team1_set1 > team2_set1) {
@@ -529,37 +529,37 @@ if (team1_set1 > team2_set1) {
 
 ---
 
-## 📝 Checklist Setup
+## 📝 Setup Checklist
 
-- [ ] livescore-listener sudah running
-- [ ] Test `/vmix-flat?id=1` (individu) atau `/vmix-flat-beregu?id=1` (beregu) di browser → data muncul
-- [ ] vMix GT Title sudah dibuat dengan field yang sesuai
-- [ ] Web Input sudah ditambahkan dengan URL yang benar
-- [ ] Auto-reload 1000ms sudah aktif
-- [ ] Data Source sudah di-link ke GT Title
-- [ ] Test dengan pertandingan real → score dan serve update
+- [ ] livescore-listener is running
+- [ ] Test `/vmix-flat?id=1` (individual) or `/vmix-flat-beregu?id=1` (team event) in a browser → data appears
+- [ ] vMix GT Title has been created with the appropriate fields
+- [ ] Web Input has been added with the correct URL
+- [ ] Auto-reload at 1000ms is enabled
+- [ ] Data Source has been linked to the GT Title
+- [ ] Test with a real match → score and serve update
 
 ---
 
 ## 🎯 Best Practices
 
-1. **Polling Interval**: 1000ms (1 detik) - balance antara real-time dan CPU usage
-2. **Backup**: Gunakan 2 lapangan (id=1 dan id=2) untuk seamless switch
-3. **Error Handling**: Tampilkan "Waiting..." jika data kosong
-4. **Preload**: Load GT Title sebelum pertandingan mulai
-5. **Test**: Selalu test dengan data dummy sebelum live
-6. **Beregu**: Ganti URL ke `-beregu` saat berpindah dari turnamen individu ke tim
+1. **Polling Interval**: 1000ms (1 second) - a balance between real-time and CPU usage
+2. **Backup**: Use 2 courts (id=1 and id=2) for a seamless switch
+3. **Error Handling**: Show "Waiting..." if the data is empty
+4. **Preload**: Load the GT Title before the match starts
+5. **Test**: Always test with dummy data before going live
+6. **Team event (beregu)**: Change the URL to `-beregu` when switching from an individual tournament to a team one
 
 ---
 
 ## 📞 Support
 
-Jika ada masalah:
-1. Check console log dari `livescore-listener`
-2. Check `/events` endpoint untuk melihat socket events
-3. Check `/status` untuk connection status
-4. Check `/debug?id=N` atau `/debug-beregu?id=N` untuk data internal court
-5. Pastikan firewall tidak block port 6969
+If you run into problems:
+1. Check the console log of `livescore-listener`
+2. Check the `/events` endpoint to see socket events
+3. Check `/status` for the connection status
+4. Check `/debug?id=N` or `/debug-beregu?id=N` for a court's internal data
+5. Make sure the firewall does not block port 6969
 
 ---
 

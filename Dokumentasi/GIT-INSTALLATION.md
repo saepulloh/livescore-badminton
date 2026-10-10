@@ -1,6 +1,6 @@
 # 📦 Git Installation Guide
 
-Panduan lengkap instalasi Livescore Listener dari GitHub repository untuk memudahkan instalasi dan update di masa depan.
+Complete guide to installing the Livescore Listener from the GitHub repository, to make installation and future updates easier.
 
 **Repository:** https://github.com/saepulloh/livescore-badminton.git
 
@@ -32,12 +32,12 @@ Panduan lengkap instalasi Livescore Listener dari GitHub repository untuk memuda
    # Linux: sudo apt install git
    ```
 
-2. **Node.js v16+**
+2. **Node.js v20+**
    ```bash
    # Check version
    node --version
    
-   # Should be v16.0.0 or higher
+   # Should be v20.0.0 or higher
    # Download: https://nodejs.org/
    ```
 
@@ -820,7 +820,7 @@ pm2 restart livescore
 ## ✅ Installation Checklist
 
 - [ ] Git installed and configured
-- [ ] Node.js v16+ installed
+- [ ] Node.js v20+ installed
 - [ ] Repository cloned
 - [ ] Dependencies installed (`npm install`)
 - [ ] `.env` file created and configured
